@@ -10,9 +10,6 @@ export default function HomePage() {
           <Link href="/login" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105">
             Login
           </Link>
-          <Link href="/dashboard" className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105">
-            Go to Dashboard
-          </Link>
         </div>
       </div>
     </main>

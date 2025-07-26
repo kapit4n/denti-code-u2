@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { authApiSlice } from '@/features/auth/authApiSlice';
 import authReducer from '@/features/auth/authSlice';
 import { patientsApiSlice } from '@/features/patients/patientsApiSlice';
+import { appointmentsApiSlice } from '@/features/appointments/appointmentsApiSlice';
 
 export const makeStore = () => {
   return configureStore({
@@ -9,11 +10,13 @@ export const makeStore = () => {
       auth: authReducer,
       [authApiSlice.reducerPath]: authApiSlice.reducer,
       [patientsApiSlice.reducerPath]: patientsApiSlice.reducer,
+      [appointmentsApiSlice.reducerPath]: appointmentsApiSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware()
         .concat(authApiSlice.middleware)
-        .concat(patientsApiSlice.middleware),
+        .concat(patientsApiSlice.middleware)
+        .concat(appointmentsApiSlice.middleware),
   });
 };
 

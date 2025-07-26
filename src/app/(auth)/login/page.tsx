@@ -1,16 +1,18 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useLoginMutation } from '@/features/auth/authApiSlice';
+import { useLoginMutation, authApiSlice } from '@/features/auth/authApiSlice';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useDispatch } from 'react-redux';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('admin@denti-code.com');
+  const [email, setEmail] = useState('patient1@example.com');
   const [password, setPassword] = useState('Password123!');
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
   const [login, { isLoading, error }] = useLoginMutation();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (error && 'data' in error) {
@@ -24,7 +26,16 @@ export default function LoginPage() {
     setErrorMessage('');
     try {
       await login({ email, password }).unwrap();
-      router.push('/dashboard');
+      const profileResult = await dispatch(authApiSlice.endpoints.getProfile.initiate()).unwrap();
+      if (profileResult.roles.includes("ADMIN")) {
+        router.push('/admin/dashboard');
+      } else if (profileResult.roles.includes("DOCTOR")) {
+        router.push('/doctor/dashboard');
+      } else if (profileResult.roles.includes("PATIENT")) {
+        router.push('/patient/dashboard');
+      } else {
+        outer.push('/not found');
+      }
     } catch (err) {
       console.error('Failed to login:', err);
       // Error message is set via the useEffect hook
