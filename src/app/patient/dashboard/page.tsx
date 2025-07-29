@@ -32,8 +32,7 @@ export default function PatientDashboardPage() {
 
   // Process the appointment data
   const now = new Date();
-  const upcomingAppointments = appointments
-    //?.filter(appt => new Date(appt.ScheduledDateTime) >= now)
+  const upcomingAppointments = appointments?.filter(appt => new Date(appt.ScheduledDateTime) >= now)
     .sort((a, b) => new Date(a.ScheduledDateTime).getTime() - new Date(b.ScheduledDateTime).getTime());
   
   const nextAppointment = upcomingAppointments?.[0];
