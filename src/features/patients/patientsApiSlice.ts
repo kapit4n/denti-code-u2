@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '@/lib/redux/store';
+import { PatientProfile } from '@/types';
 
 export const patientsApiSlice = createApi({
   reducerPath: 'patientsApi',
@@ -13,7 +14,7 @@ export const patientsApiSlice = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Patient'],
+  tagTypes: ['Patient', 'MyProfile'],
   endpoints: (builder) => ({
     getPatients: builder.query<any[], void>({
       query: () => '/patients',
@@ -25,7 +26,19 @@ export const patientsApiSlice = createApi({
             ]
           : [{ type: 'Patient', id: 'LIST' }],
     }),
+    getMyProfile: builder.query<PatientProfile, void>({
+      query: () => '/patients/me', // Assumes a backend route that gets the logged-in user's patient record
+      providesTags: ['MyProfile'],
+    }),
+    updateMyProfile: builder.mutation<PatientProfile, Partial<PatientProfile>>({
+      query: (profileData) => ({
+        url: '/patients/me', // Assumes a backend route to update the logged-in user's patient record
+        method: 'PATCH',
+        body: profileData,
+      }),
+      invalidatesTags: ['MyProfile'], // Invalidate the profile cache on update
+    }),
   }),
 });
 
-export const { useGetPatientsQuery } = patientsApiSlice;
+export const { useGetPatientsQuery, useGetMyProfileQuery, useUpdateMyProfileMutation } = patientsApiSlice;

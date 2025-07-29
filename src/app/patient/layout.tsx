@@ -8,7 +8,6 @@ export default function DashboardLayout({
 }) {
   return (
     <AuthChecker>
-
       <div className="flex h-screen bg-gray-50">
         <aside className="w-64 bg-white border-r flex flex-col">
            <div className="p-4 font-bold text-2xl border-b text-gray-800">Denti-Code</div>
@@ -18,6 +17,9 @@ export default function DashboardLayout({
             </Link>
             <Link href="appointments" className="flex items-center gap-3 py-2 px-3 rounded-md hover:bg-gray-100 text-gray-700 font-medium">
                 <span>Appointments</span>
+            </Link>
+            <Link href="profile" className="flex items-center gap-3 py-2 px-3 rounded-md hover:bg-gray-100 text-gray-700 font-medium">
+                <span>Profile</span>
             </Link>
             <Link href="settings" className="flex items-center gap-3 py-2 px-3 rounded-md hover:bg-gray-100 text-gray-700 font-medium">
                 <span>Settings</span>

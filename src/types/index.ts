@@ -9,3 +9,15 @@ export interface Appointment {
   //   LastName: string;
   // }
 }
+
+export interface PatientProfile {
+  PatientID: number;
+  FirstName: string;
+  LastName: string;
+  DateOfBirth: string;
+  Gender?: string;
+  Address?: string;
+  ContactPhone: string;
+  Email?: string;
+  MedicalHistorySummary?: string;
+}
