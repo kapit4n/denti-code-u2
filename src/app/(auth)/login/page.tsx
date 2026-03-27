@@ -1,9 +1,9 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useLoginMutation, authApiSlice } from '@/features/auth/authApiSlice';
+import { useLoginMutation } from '@/features/auth/authApiSlice';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/lib/redux/hooks';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('patient1@example.com');
@@ -12,7 +12,7 @@ export default function LoginPage() {
   const router = useRouter();
 
   const [login, { isLoading, error }] = useLoginMutation();
-  const dispatch = useDispatch();
+  const user = useAppSelector((state) => state.auth.user);
 
   useEffect(() => {
     if (error && 'data' in error) {
@@ -25,16 +25,18 @@ export default function LoginPage() {
     e.preventDefault();
     setErrorMessage('');
     try {
-      await login({ email, password }).unwrap();
-      const profileResult = await dispatch(authApiSlice.endpoints.getProfile.initiate()).unwrap();
-      if (profileResult.roles.includes("ADMIN")) {
+      const data = await login({ email, password }).unwrap();
+
+      const roles = data?.user?.roles ?? user?.roles ?? [];
+
+      if (roles.includes('ADMIN')) {
         router.push('/admin/dashboard');
-      } else if (profileResult.roles.includes("DOCTOR")) {
+      } else if (roles.includes('DOCTOR')) {
         router.push('/doctor/dashboard');
-      } else if (profileResult.roles.includes("PATIENT")) {
+      } else if (roles.includes('PATIENT')) {
         router.push('/patient/dashboard');
       } else {
-        outer.push('/not found');
+        router.push('/');
       }
     } catch (err) {
       console.error('Failed to login:', err);
