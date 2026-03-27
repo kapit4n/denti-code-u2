@@ -25,6 +25,13 @@ cleanup() {
 }
 trap cleanup INT TERM
 
+free_port() {
+  local port="$1"
+  if command -v fuser >/dev/null 2>&1; then
+    fuser -k "${port}/tcp" >/dev/null 2>&1 || true
+  fi
+}
+
 start_with_env() {
   local name="$1"
   local dir="$2"
@@ -54,10 +61,20 @@ start_with_env() {
 
 case "$MODE" in
   dev)
+    # Ensure old/stale local processes from previous runs don't block service ports.
+    free_port 3000
+    free_port 3001
+    free_port 3002
+    free_port 3003
+    free_port 3004
+    free_port 3005
+
     start_with_env "appointments" "$APPOINTMENTS_DIR" "npm run dev" "$LOG_DIR/appointments.log"
     start_with_env "provider" "$PROVIDER_DIR" "npm run start:dev" "$LOG_DIR/provider.log"
     start_with_env "auth" "$AUTH_DIR" "npm run start:dev" "$LOG_DIR/auth.log"
-    start_with_env "patients" "$PATIENTS_DIR" "npm run dev" "$LOG_DIR/patients.log"
+    # Run only the API server in dev. `npm run dev` also starts the RabbitMQ consumer
+    # which can fail/retry endlessly when RabbitMQ is not running and destabilize local setup.
+    start_with_env "patients" "$PATIENTS_DIR" "npm run dev:server" "$LOG_DIR/patients.log"
 
     # UI2 (Next.js) runs on an internal port; the gateway proxies it.
     start_with_env "ui2" "$U2_DIR" "PORT=3005 npm run dev" "$LOG_DIR/ui2.log"
@@ -71,6 +88,13 @@ case "$MODE" in
     PIDS+=("$!")
     ;;
   start)
+    free_port 3000
+    free_port 3001
+    free_port 3002
+    free_port 3003
+    free_port 3004
+    free_port 3005
+
     start_with_env "appointments" "$APPOINTMENTS_DIR" "npm run build && npm run start" "$LOG_DIR/appointments.log"
     start_with_env "provider" "$PROVIDER_DIR" "npm run build && npm run start:prod" "$LOG_DIR/provider.log"
     start_with_env "auth" "$AUTH_DIR" "npm run build && npm run start:prod" "$LOG_DIR/auth.log"

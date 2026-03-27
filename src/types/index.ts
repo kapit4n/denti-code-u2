@@ -1,5 +1,6 @@
 export interface Appointment {
   AppointmentID: number;
+  PatientID: number;
   ScheduledDateTime: string; // ISO date string
   AppointmentPurpose: string;
   Status: 'Scheduled' | 'Confirmed' | 'Completed' | 'Cancelled' | 'NoShow';

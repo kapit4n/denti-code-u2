@@ -38,8 +38,7 @@ export default function LoginPage() {
       } else {
         router.push('/');
       }
-    } catch (err) {
-      console.error('Failed to login:', err);
+    } catch {
       // Error message is set via the useEffect hook
     }
   };
@@ -57,6 +56,7 @@ export default function LoginPage() {
               className="shadow-sm appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
               id="email"
               type="email"
+              autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
@@ -71,6 +71,7 @@ export default function LoginPage() {
               className="shadow-sm appearance-none border rounded w-full py-3 px-4 text-gray-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
               id="password"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="******************"

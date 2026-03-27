@@ -16,17 +16,38 @@ export const authApiSlice = createApi({
   }),
   endpoints: (builder) => ({
     login: builder.mutation({
-      query: (credentials) => ({
-        url: '/auth/login',
-        method: 'POST',
-        body: credentials,
-      }),
+      async queryFn(credentials, _api, _extraOptions, fetchWithBQ) {
+        const loginResult = await fetchWithBQ({
+          url: '/auth/login',
+          method: 'POST',
+          body: credentials,
+        });
+
+        if (loginResult.error) return { error: loginResult.error };
+
+        const { access_token } = loginResult.data as { access_token: string };
+
+        const profileResult = await fetchWithBQ({
+          url: '/auth/profile',
+          method: 'GET',
+          headers: { authorization: `Bearer ${access_token}` },
+        });
+
+        if (profileResult.error) return { error: profileResult.error };
+
+        return {
+          data: {
+            access_token,
+            user: profileResult.data,
+          },
+        };
+      },
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
           dispatch(setCredentials(data));
-        } catch (error) {
-          console.error(error);
+        } catch {
+          // Login errors are surfaced through RTK Query error state in the UI.
         }
       },
     }),

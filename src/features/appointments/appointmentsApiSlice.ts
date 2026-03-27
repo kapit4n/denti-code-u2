@@ -1,14 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '@/lib/redux/store';
-
-// Define a type for a single appointment for better type safety
-interface Appointment {
-  AppointmentID: number;
-  ScheduledDateTime: string; // ISO string
-  AppointmentPurpose: string;
-  Status: string;
-  // You can add doctor and other details here if your API returns them
-}
+import type { Appointment, PatientProfile } from '@/types';
 
 // This is a new API slice specifically for appointment data
 export const appointmentsApiSlice = createApi({
@@ -25,10 +17,24 @@ export const appointmentsApiSlice = createApi({
   }),
   tagTypes: ['Appointment'],
   endpoints: (builder) => ({
-    // Endpoint to get appointments for the currently logged-in user
-    // The backend uses the X-User-Id header to filter the data
     getMyAppointments: builder.query<Appointment[], void>({
-      query: () => '/appointments/me', // Assumes a backend route like this exists
+      async queryFn(_arg, _api, _extraOptions, fetchWithBQ) {
+        const profileResult = await fetchWithBQ('/patients/me');
+        if (profileResult.error) return { error: profileResult.error };
+
+        const patientProfile = profileResult.data as PatientProfile;
+        const patientId = patientProfile.PatientID;
+
+        const appointmentsResult = await fetchWithBQ('/appointments');
+        if (appointmentsResult.error) return { error: appointmentsResult.error };
+
+        const allAppointments = appointmentsResult.data as Appointment[];
+        const myAppointments = allAppointments.filter(
+          (appointment) => appointment.PatientID === patientId,
+        );
+
+        return { data: myAppointments };
+      },
       providesTags: (result) =>
         result
           ? [

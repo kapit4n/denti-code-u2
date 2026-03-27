@@ -2,7 +2,13 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '@/lib/redux/store';
 
 type AuthState = {
-  user: { id: string; email: string; roles: string[] } | null;
+  user: {
+    id: string;
+    email: string;
+    roles: string[];
+    firstName?: string;
+    lastName?: string;
+  } | null;
   token: string | null;
 };
 
@@ -16,11 +22,6 @@ const authSlice = createSlice({
       state,
       action: PayloadAction<{ user: any; access_token: string }>
     ) => {
-      console.log(action.payload)
-      console.log(action.payload)
-      console.log(action.payload)
-      console.log(action.payload)
-      console.log(action.payload)
       state.user = action.payload.user;
       state.token = action.payload.access_token;
     },
