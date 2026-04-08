@@ -10,9 +10,11 @@ type AuthState = {
     lastName?: string;
   } | null;
   token: string | null;
+  /** Client-only: false until cookie/session restore attempt finishes */
+  hydrated: boolean;
 };
 
-const initialState: AuthState = { user: null, token: null };
+const initialState: AuthState = { user: null, token: null, hydrated: false };
 
 const authSlice = createSlice({
   name: 'auth',
@@ -29,12 +31,16 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
     },
+    setAuthHydrated: (state, action: PayloadAction<boolean>) => {
+      state.hydrated = action.payload;
+    },
   },
 });
 
-export const { setCredentials, logout } = authSlice.actions;
+export const { setCredentials, logout, setAuthHydrated } = authSlice.actions;
 
 export default authSlice.reducer;
 
 export const selectCurrentUser = (state: RootState) => state.auth.user;
 export const selectCurrentToken = (state: RootState) => state.auth.token;
+export const selectAuthHydrated = (state: RootState) => state.auth.hydrated;

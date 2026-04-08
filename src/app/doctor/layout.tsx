@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import AuthChecker from './_components/AuthChecker';
+import AuthChecker from '@/components/AuthChecker';
 
 export default function DashboardLayout({
   children,

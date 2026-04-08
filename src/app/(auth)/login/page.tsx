@@ -27,7 +27,8 @@ export default function LoginPage() {
     try {
       const data = await login({ email, password }).unwrap();
 
-      const roles = data?.user?.roles ?? user?.roles ?? [];
+      const profileUser = data?.user as { roles?: string[] } | undefined;
+      const roles = profileUser?.roles ?? user?.roles ?? [];
 
       if (roles.includes('ADMIN')) {
         router.push('/admin/dashboard');

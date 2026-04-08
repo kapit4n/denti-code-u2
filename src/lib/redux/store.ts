@@ -1,8 +1,26 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, createListenerMiddleware } from '@reduxjs/toolkit';
 import { authApiSlice } from '@/features/auth/authApiSlice';
-import authReducer from '@/features/auth/authSlice';
+import authReducer, { setCredentials, logout } from '@/features/auth/authSlice';
 import { patientsApiSlice } from '@/features/patients/patientsApiSlice';
 import { appointmentsApiSlice } from '@/features/appointments/appointmentsApiSlice';
+import {
+  setAuthTokenCookie,
+  clearAuthTokenCookie,
+} from '@/lib/auth/sessionCookie';
+
+const authSessionListener = createListenerMiddleware();
+authSessionListener.startListening({
+  actionCreator: setCredentials,
+  effect: (action) => {
+    setAuthTokenCookie(action.payload.access_token);
+  },
+});
+authSessionListener.startListening({
+  actionCreator: logout,
+  effect: () => {
+    clearAuthTokenCookie();
+  },
+});
 
 export const makeStore = () => {
   return configureStore({
@@ -14,6 +32,7 @@ export const makeStore = () => {
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware()
+        .prepend(authSessionListener.middleware)
         .concat(authApiSlice.middleware)
         .concat(patientsApiSlice.middleware)
         .concat(appointmentsApiSlice.middleware),
