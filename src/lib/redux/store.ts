@@ -3,6 +3,7 @@ import { authApiSlice } from '@/features/auth/authApiSlice';
 import authReducer, { setCredentials, logout } from '@/features/auth/authSlice';
 import { patientsApiSlice } from '@/features/patients/patientsApiSlice';
 import { appointmentsApiSlice } from '@/features/appointments/appointmentsApiSlice';
+import { doctorsApiSlice } from '@/features/doctors/doctorsApiSlice';
 import {
   setAuthTokenCookie,
   clearAuthTokenCookie,
@@ -29,13 +30,15 @@ export const makeStore = () => {
       [authApiSlice.reducerPath]: authApiSlice.reducer,
       [patientsApiSlice.reducerPath]: patientsApiSlice.reducer,
       [appointmentsApiSlice.reducerPath]: appointmentsApiSlice.reducer,
+      [doctorsApiSlice.reducerPath]: doctorsApiSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware()
         .prepend(authSessionListener.middleware)
         .concat(authApiSlice.middleware)
         .concat(patientsApiSlice.middleware)
-        .concat(appointmentsApiSlice.middleware),
+        .concat(appointmentsApiSlice.middleware)
+        .concat(doctorsApiSlice.middleware),
   });
 };
 

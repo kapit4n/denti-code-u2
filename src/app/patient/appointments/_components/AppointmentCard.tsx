@@ -23,7 +23,9 @@ export default function AppointmentCard({ appointment, isPast = false }: Appoint
     <div className={`bg-white p-5 rounded-lg shadow-md border-l-4 ${isPast ? 'border-gray-400 opacity-75' : 'border-blue-500'}`}>
       <div className="flex justify-between items-start">
         <div>
-          <p className="text-lg font-bold text-gray-800">{appointment.AppointmentPurpose}</p>
+          <p className="text-lg font-bold text-gray-800">
+            {appointment.AppointmentPurpose || 'Appointment'}
+          </p>
           <p className="text-sm text-gray-500">Status: {appointment.Status}</p>
         </div>
         <div className="text-right">

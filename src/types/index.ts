@@ -1,14 +1,34 @@
 export interface Appointment {
   AppointmentID: number;
   PatientID: number;
-  ScheduledDateTime: string; // ISO date string
-  AppointmentPurpose: string;
+  PrimaryDoctorID: number;
+  ScheduledDateTime: string;
+  AppointmentPurpose: string | null;
   Status: 'Scheduled' | 'Confirmed' | 'Completed' | 'Cancelled' | 'NoShow';
-  // You can add more fields that your API returns, e.g., doctor details
-  // doctor: {
-  //   FirstName: string;
-  //   LastName: string;
-  // }
+  Notes?: string | null;
+  EstimatedDurationMinutes?: number | null;
+}
+
+export interface CreateAppointmentInput {
+  PatientID: number;
+  PrimaryDoctorID: number;
+  ScheduledDateTime: string;
+  EstimatedDurationMinutes?: number;
+  AppointmentPurpose?: string;
+  Status: Appointment['Status'];
+  Notes?: string;
+}
+
+export interface ClinicDoctor {
+  DoctorID: number;
+  FirstName: string;
+  LastName: string;
+  Email: string;
+  ContactPhone: string;
+  LicenseNumber: string;
+  OfficeRoomNumber?: string | null;
+  IsActive?: boolean;
+  SpecializationID?: number | null;
 }
 
 export interface PatientProfile {

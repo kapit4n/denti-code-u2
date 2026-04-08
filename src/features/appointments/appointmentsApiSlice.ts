@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '@/lib/redux/store';
-import type { Appointment, PatientProfile } from '@/types';
+import type { Appointment, CreateAppointmentInput, PatientProfile } from '@/types';
 
 // This is a new API slice specifically for appointment data
 export const appointmentsApiSlice = createApi({
@@ -17,6 +17,24 @@ export const appointmentsApiSlice = createApi({
   }),
   tagTypes: ['Appointment'],
   endpoints: (builder) => ({
+    getAppointments: builder.query<Appointment[], void>({
+      query: () => '/appointments',
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ AppointmentID }) => ({ type: 'Appointment' as const, id: AppointmentID })),
+              { type: 'Appointment', id: 'LIST' },
+            ]
+          : [{ type: 'Appointment', id: 'LIST' }],
+    }),
+    createAppointment: builder.mutation<Appointment, CreateAppointmentInput>({
+      query: (body) => ({
+        url: '/appointments',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: [{ type: 'Appointment', id: 'LIST' }],
+    }),
     getMyAppointments: builder.query<Appointment[], void>({
       async queryFn(_arg, _api, _extraOptions, fetchWithBQ) {
         const profileResult = await fetchWithBQ('/patients/me');
@@ -46,4 +64,8 @@ export const appointmentsApiSlice = createApi({
   }),
 });
 
-export const { useGetMyAppointmentsQuery } = appointmentsApiSlice;
+export const {
+  useGetMyAppointmentsQuery,
+  useGetAppointmentsQuery,
+  useCreateAppointmentMutation,
+} = appointmentsApiSlice;
