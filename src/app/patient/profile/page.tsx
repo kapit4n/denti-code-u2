@@ -5,6 +5,7 @@ import { useGetMyProfileQuery } from '@/features/patients/patientsApiSlice';
 import ProfileView from './_components/ProfileView';
 import ProfileForm from './_components/ProfileForm';
 import ProfileSkeleton from './_components/ProfileSkeleton';
+import PatientProfileAppointments from './_components/PatientProfileAppointments';
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -31,11 +32,22 @@ export default function ProfilePage() {
   };
 
   return (
-    <div>
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">My Profile</h2>
-      <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-        {renderContent()}
+    <div className="space-y-10">
+      <div>
+        <h2 className="text-3xl font-bold mb-6 text-gray-800">My Profile</h2>
+        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          {renderContent()}
+        </div>
       </div>
+
+      <section className="border-t border-gray-200 pt-8">
+        <h3 className="text-xl font-semibold text-gray-800 mb-2">Your appointments</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Upcoming visits booked for you. Accept to confirm, reschedule for a new time, or cancel
+          if you cannot attend.
+        </p>
+        <PatientProfileAppointments />
+      </section>
     </div>
   );
 }

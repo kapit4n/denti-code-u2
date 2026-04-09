@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useGetMyAppointmentsQuery } from '@/features/appointments/appointmentsApiSlice';
 import AppointmentsList from './_components/AppointmentsList';
 import AppointmentsSkeleton from './_components/AppointmentsSkeleton';
@@ -11,6 +12,13 @@ export default function AppointmentsPage() {
     isError,
     error,
   } = useGetMyAppointmentsQuery();
+
+  useEffect(() => {
+    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+    if (!hash.startsWith('#patient-appt-')) return;
+    const el = document.querySelector(hash);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [appointments]);
 
   const renderContent = () => {
     if (isLoading) {

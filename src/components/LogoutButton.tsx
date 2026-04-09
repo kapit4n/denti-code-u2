@@ -7,6 +7,7 @@ import { authApiSlice } from '@/features/auth/authApiSlice';
 import { patientsApiSlice } from '@/features/patients/patientsApiSlice';
 import { appointmentsApiSlice } from '@/features/appointments/appointmentsApiSlice';
 import { doctorsApiSlice } from '@/features/doctors/doctorsApiSlice';
+import { proceduresApiSlice } from '@/features/procedures/proceduresApiSlice';
 
 type Props = {
   className?: string;
@@ -22,6 +23,7 @@ export default function LogoutButton({ className }: Props) {
     dispatch(patientsApiSlice.util.resetApiState());
     dispatch(appointmentsApiSlice.util.resetApiState());
     dispatch(doctorsApiSlice.util.resetApiState());
+    dispatch(proceduresApiSlice.util.resetApiState());
     router.push('/login');
     router.refresh();
   };

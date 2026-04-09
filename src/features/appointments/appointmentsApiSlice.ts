@@ -1,6 +1,14 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '@/lib/redux/store';
-import type { Appointment, CreateAppointmentInput, PatientProfile } from '@/types';
+import type {
+  Appointment,
+  AppointmentDetail,
+  CreateAppointmentInput,
+  CreatePerformedActionInput,
+  PatientProfile,
+  PerformedAction,
+  UpdateAppointmentInput,
+} from '@/types';
 
 // This is a new API slice specifically for appointment data
 export const appointmentsApiSlice = createApi({
@@ -35,6 +43,51 @@ export const appointmentsApiSlice = createApi({
       }),
       invalidatesTags: [{ type: 'Appointment', id: 'LIST' }],
     }),
+    updateAppointment: builder.mutation<
+      Appointment,
+      { id: number; body: UpdateAppointmentInput }
+    >({
+      query: ({ id, body }) => ({
+        url: `/appointments/${id}`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: 'Appointment', id },
+        { type: 'Appointment', id: 'LIST' },
+      ],
+    }),
+    getAppointment: builder.query<AppointmentDetail, number>({
+      query: (id) => `/appointments/${id}`,
+      providesTags: (result, _err, id) => [{ type: 'Appointment', id }],
+    }),
+    addPerformedAction: builder.mutation<
+      PerformedAction,
+      { appointmentId: number; body: CreatePerformedActionInput }
+    >({
+      query: ({ appointmentId, body }) => ({
+        url: `/appointments/${appointmentId}/actions`,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: (_r, _e, { appointmentId }) => [
+        { type: 'Appointment', id: appointmentId },
+        { type: 'Appointment', id: 'LIST' },
+      ],
+    }),
+    removePerformedAction: builder.mutation<
+      void,
+      { actionId: number; appointmentId: number }
+    >({
+      query: ({ actionId }) => ({
+        url: `/actions/${actionId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (_r, _e, { appointmentId }) => [
+        { type: 'Appointment', id: appointmentId },
+        { type: 'Appointment', id: 'LIST' },
+      ],
+    }),
     getMyAppointments: builder.query<Appointment[], void>({
       async queryFn(_arg, _api, _extraOptions, fetchWithBQ) {
         const profileResult = await fetchWithBQ('/patients/me');
@@ -68,4 +121,8 @@ export const {
   useGetMyAppointmentsQuery,
   useGetAppointmentsQuery,
   useCreateAppointmentMutation,
+  useUpdateAppointmentMutation,
+  useGetAppointmentQuery,
+  useAddPerformedActionMutation,
+  useRemovePerformedActionMutation,
 } = appointmentsApiSlice;

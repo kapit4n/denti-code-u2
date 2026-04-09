@@ -16,15 +16,22 @@ export const patientsApiSlice = createApi({
   }),
   tagTypes: ['Patient', 'MyProfile'],
   endpoints: (builder) => ({
-    getPatients: builder.query<any[], void>({
+    getPatients: builder.query<PatientProfile[], void>({
       query: () => '/patients',
       providesTags: (result) =>
         result
           ? [
-              ...result.map(({ id }) => ({ type: 'Patient' as const, id })),
+              ...result.map((p) => ({
+                type: 'Patient' as const,
+                id: p.PatientID,
+              })),
               { type: 'Patient', id: 'LIST' },
             ]
           : [{ type: 'Patient', id: 'LIST' }],
+    }),
+    getPatientById: builder.query<PatientProfile, number>({
+      query: (patientId) => `/patients/${patientId}`,
+      providesTags: (_result, _err, id) => [{ type: 'Patient', id }],
     }),
     getMyProfile: builder.query<PatientProfile, void>({
       query: () => '/patients/me', // Assumes a backend route that gets the logged-in user's patient record
@@ -41,4 +48,9 @@ export const patientsApiSlice = createApi({
   }),
 });
 
-export const { useGetPatientsQuery, useGetMyProfileQuery, useUpdateMyProfileMutation } = patientsApiSlice;
+export const {
+  useGetPatientsQuery,
+  useGetPatientByIdQuery,
+  useGetMyProfileQuery,
+  useUpdateMyProfileMutation,
+} = patientsApiSlice;

@@ -1,12 +1,63 @@
+export type AppointmentStatus =
+  | 'Scheduled'
+  | 'Confirmed'
+  | 'InProgress'
+  | 'Completed'
+  | 'Cancelled'
+  | 'NoShow'
+  | 'Rescheduled';
+
+export interface PerformedAction {
+  PerformedActionID: number;
+  AppointmentID: number;
+  ProcedureTypeID: number;
+  PerformingDoctorID: number;
+  ActionDateTime: string;
+  ToothInvolved: string | null;
+  SurfacesInvolved: string | null;
+  AnesthesiaUsed: string | null;
+  Description_Notes: string | null;
+  Quantity: number;
+  UnitPrice: number;
+  TotalPrice: number;
+}
+
 export interface Appointment {
   AppointmentID: number;
   PatientID: number;
   PrimaryDoctorID: number;
   ScheduledDateTime: string;
   AppointmentPurpose: string | null;
-  Status: 'Scheduled' | 'Confirmed' | 'Completed' | 'Cancelled' | 'NoShow';
+  Status: AppointmentStatus;
   Notes?: string | null;
   EstimatedDurationMinutes?: number | null;
+  performedActions?: PerformedAction[];
+}
+
+export interface AppointmentDetail extends Appointment {
+  performedActions: PerformedAction[];
+}
+
+export interface CreatePerformedActionInput {
+  ProcedureTypeID: number;
+  PerformingDoctorID: number;
+  ToothInvolved?: string;
+  SurfacesInvolved?: string;
+  AnesthesiaUsed?: string;
+  Description_Notes?: string;
+  Quantity: number;
+  UnitPrice: number;
+}
+
+export interface ProcedureType {
+  ProcedureTypeID: number;
+  ProcedureName: string;
+  Description?: string | null;
+  DefaultDurationMinutes?: number | null;
+  StandardPrice?: number | null;
+  RequiresToothSpecification?: boolean;
+  IsActive?: boolean;
+  CategoryID?: number;
 }
 
 export interface CreateAppointmentInput {
@@ -18,6 +69,13 @@ export interface CreateAppointmentInput {
   Status: Appointment['Status'];
   Notes?: string;
 }
+
+export type UpdateAppointmentInput = Partial<
+  Pick<
+    CreateAppointmentInput,
+    'ScheduledDateTime' | 'EstimatedDurationMinutes' | 'AppointmentPurpose' | 'Status' | 'Notes'
+  >
+>;
 
 export interface ClinicDoctor {
   DoctorID: number;

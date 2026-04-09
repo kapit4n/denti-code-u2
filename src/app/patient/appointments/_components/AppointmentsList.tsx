@@ -23,8 +23,8 @@ export default function AppointmentsList({ appointments }: AppointmentsListProps
         <h3 className="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Upcoming</h3>
         {upcomingAppointments.length > 0 ? (
           <div className="space-y-4">
-            {upcomingAppointments.map(appt => (
-              <AppointmentCard key={appt.AppointmentID} appointment={appt} />
+            {upcomingAppointments.map((appt) => (
+              <AppointmentCard key={appt.AppointmentID} appointment={appt} patientActions />
             ))}
           </div>
         ) : (
@@ -37,8 +37,8 @@ export default function AppointmentsList({ appointments }: AppointmentsListProps
         <h3 className="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">History</h3>
         {pastAppointments.length > 0 ? (
           <div className="space-y-4">
-            {pastAppointments.map(appt => (
-              <AppointmentCard key={appt.AppointmentID} appointment={appt} isPast />
+            {pastAppointments.map((appt) => (
+              <AppointmentCard key={appt.AppointmentID} appointment={appt} isPast patientActions />
             ))}
           </div>
         ) : (

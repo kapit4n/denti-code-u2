@@ -2,7 +2,11 @@
 
 import { useState } from 'react';
 import { useCreateAppointmentMutation } from '@/features/appointments/appointmentsApiSlice';
-import type { PatientProfile } from '@/types';
+import {
+  NEW_APPOINTMENT_STATUSES,
+  appointmentStatusLabel,
+} from '@/lib/appointments/appointmentStatus';
+import type { AppointmentStatus, PatientProfile } from '@/types';
 
 type Props = {
   open: boolean;
@@ -22,6 +26,7 @@ export default function CreateAppointmentModal({
   const [purpose, setPurpose] = useState('');
   const [duration, setDuration] = useState('30');
   const [notes, setNotes] = useState('');
+  const [status, setStatus] = useState<AppointmentStatus>('Scheduled');
   const [error, setError] = useState('');
   const [createAppointment, { isLoading }] = useCreateAppointmentMutation();
 
@@ -49,7 +54,7 @@ export default function CreateAppointmentModal({
         ScheduledDateTime: scheduledDateTime,
         EstimatedDurationMinutes: durationMins,
         ...(purpose.trim() ? { AppointmentPurpose: purpose.trim() } : {}),
-        Status: 'Scheduled',
+        Status: status,
         ...(notes.trim() ? { Notes: notes.trim() } : {}),
       }).unwrap();
       onClose();
@@ -58,6 +63,7 @@ export default function CreateAppointmentModal({
       setPurpose('');
       setDuration('30');
       setNotes('');
+      setStatus('Scheduled');
     } catch {
       setError('Could not create appointment. Check inputs and try again.');
     }
@@ -102,6 +108,26 @@ export default function CreateAppointmentModal({
                 </option>
               ))}
             </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="appt-status">
+              Initial status
+            </label>
+            <select
+              id="appt-status"
+              className="w-full border rounded-lg px-3 py-2 text-gray-800"
+              value={status}
+              onChange={(e) => setStatus(e.target.value as AppointmentStatus)}
+            >
+              {NEW_APPOINTMENT_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {appointmentStatusLabel(s)}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              Use Confirmed when the patient has already agreed to this slot.
+            </p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="when">

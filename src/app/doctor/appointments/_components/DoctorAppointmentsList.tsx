@@ -1,5 +1,10 @@
 'use client';
 
+import Link from 'next/link';
+import {
+  appointmentStatusBadgeClass,
+  appointmentStatusLabel,
+} from '@/lib/appointments/appointmentStatus';
 import type { Appointment } from '@/types';
 import type { PatientProfile } from '@/types';
 
@@ -43,14 +48,36 @@ export default function DoctorAppointmentsList({ appointments, patientById }: Pr
       ? `${patient.FirstName} ${patient.LastName}`
       : `Patient #${appt.PatientID}`;
 
+    const lineTotal =
+      appt.performedActions?.reduce((s, a) => s + a.TotalPrice, 0) ?? 0;
+    const money = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    });
+
     return (
       <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm flex flex-wrap gap-4 justify-between items-start">
-        <div>
+        <div className="flex-1 min-w-[200px]">
           <p className="font-semibold text-gray-900">{patientLabel}</p>
           <p className="text-sm text-gray-600">
             {appt.AppointmentPurpose || 'No purpose listed'}
           </p>
-          <p className="text-xs text-gray-500 mt-1">Status: {appt.Status}</p>
+          <p className="text-xs text-gray-500 mt-1">
+            <span className={appointmentStatusBadgeClass(appt.Status)}>
+              {appointmentStatusLabel(appt.Status)}
+            </span>
+          </p>
+          {lineTotal > 0 && (
+            <p className="text-xs text-gray-600 mt-1">
+              Recorded treatments: {money.format(lineTotal)}
+            </p>
+          )}
+          <Link
+            href={`/doctor/appointments/${appt.AppointmentID}`}
+            className="inline-block mt-3 text-sm font-medium text-blue-600 hover:text-blue-800"
+          >
+            Treatments & costs →
+          </Link>
         </div>
         <div className="text-right text-sm">
           <p className="font-medium text-gray-800">{date}</p>
