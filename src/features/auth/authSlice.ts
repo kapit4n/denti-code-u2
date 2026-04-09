@@ -7,6 +7,8 @@ export type AuthUser = {
   roles: string[];
   firstName?: string;
   lastName?: string;
+  /** Null or absent: follow organization default from AppSettings. */
+  preferredLocale?: string | null;
   /** If the auth profile ever returns a photo URL, it will be used in the header avatar */
   avatarUrl?: string;
   imageUrl?: string;
@@ -40,10 +42,15 @@ const authSlice = createSlice({
     setAuthHydrated: (state, action: PayloadAction<boolean>) => {
       state.hydrated = action.payload;
     },
+    updateAuthUser: (state, action: PayloadAction<Partial<AuthUser>>) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+      }
+    },
   },
 });
 
-export const { setCredentials, logout, setAuthHydrated } = authSlice.actions;
+export const { setCredentials, logout, setAuthHydrated, updateAuthUser } = authSlice.actions;
 
 export default authSlice.reducer;
 

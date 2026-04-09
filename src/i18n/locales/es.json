@@ -1,0 +1,83 @@
+{
+  "common": {
+    "loading": "Cargando…",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "saved": "Guardado.",
+    "error": "Algo salió mal.",
+    "back": "Volver"
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "patients": "Pacientes",
+    "appointments": "Citas",
+    "account": "Cuenta",
+    "settings": "Ajustes",
+    "home": "Inicio",
+    "visits": "Visitas",
+    "calendar": "Calendario",
+    "yourDetails": "Tus datos"
+  },
+  "sidebar": {
+    "brand": "Denti-Code",
+    "hideNav": "Ocultar panel de navegación",
+    "hideNavTitle": "Ocultar navegación",
+    "showNav": "Mostrar panel de navegación",
+    "showNavTitle": "Mostrar navegación"
+  },
+  "logout": "Cerrar sesión",
+  "login": {
+    "title": "Iniciar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "submit": "Entrar",
+    "submitting": "Entrando…",
+    "unknownError": "Ocurrió un error desconocido.",
+    "backHome": "Volver al inicio"
+  },
+  "home": {
+    "title": "Bienvenido a Denti-Code",
+    "subtitle": "Tu asistente moderno para la clínica dental.",
+    "login": "Iniciar sesión"
+  },
+  "portal": {
+    "administration": "Administración",
+    "doctorSubtitle": "Tu agenda, pacientes que atiendes y documentación de visitas",
+    "patientSubtitle": "Citas, tu dentista y costos de visita en un solo lugar",
+    "admin": "Admin",
+    "doctor": "Doctor",
+    "patientThere": "allí",
+    "hi": "Hola, {name}",
+    "dr": "Dr. {name}"
+  },
+  "profile": {
+    "avatarAria": "Tu perfil y cuenta",
+    "avatarTitle": "Perfil"
+  },
+  "language": {
+    "menuAria": "Idioma de la interfaz",
+    "useOrgDefault": "Predeterminado de la organización",
+    "preferenceHint": "Tu elección se guarda en tu cuenta."
+  },
+  "adminDashboard": {
+    "title": "Resumen del panel",
+    "todayAppointments": "Citas de hoy",
+    "newPatientsMonth": "Pacientes nuevos (mes)",
+    "pendingTasks": "Tareas pendientes",
+    "revenueToday": "Ingresos (hoy)"
+  },
+  "adminSettings": {
+    "title": "Ajustes de la organización",
+    "intro": "Configura valores predeterminados para todos los usuarios. Cada persona puede elegir su idioma en la cabecera.",
+    "defaultLanguage": "Idioma predeterminado",
+    "defaultLanguageHelp": "Se usa si el usuario no eligió un idioma personal. Las cuentas nuevas y el inicio de sesión usan este valor al cargarlo del servidor.",
+    "backDashboard": "← Panel"
+  },
+  "adminProfile": {
+    "title": "Tu cuenta",
+    "intro": "Usuario activo del servicio de autenticación. Abre tu perfil desde el avatar redondo en la cabecera.",
+    "userId": "ID de usuario",
+    "roles": "Roles",
+    "backDashboard": "← Panel"
+  }
+}

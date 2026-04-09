@@ -1,0 +1,83 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved.",
+    "error": "Something went wrong.",
+    "back": "Back"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "patients": "Patients",
+    "appointments": "Appointments",
+    "account": "Account",
+    "settings": "Settings",
+    "home": "Home",
+    "visits": "Visits",
+    "calendar": "Calendar",
+    "yourDetails": "Your details"
+  },
+  "sidebar": {
+    "brand": "Denti-Code",
+    "hideNav": "Hide navigation panel",
+    "hideNavTitle": "Hide navigation",
+    "showNav": "Show navigation panel",
+    "showNavTitle": "Show navigation"
+  },
+  "logout": "Log out",
+  "login": {
+    "title": "Sign In",
+    "email": "Email address",
+    "password": "Password",
+    "submit": "Sign In",
+    "submitting": "Logging in…",
+    "unknownError": "An unknown error occurred.",
+    "backHome": "Back to Home"
+  },
+  "home": {
+    "title": "Welcome to Denti-Code",
+    "subtitle": "Your modern dental practice assistant.",
+    "login": "Login"
+  },
+  "portal": {
+    "administration": "Administration",
+    "doctorSubtitle": "Your schedule, patients you treat, and visit documentation",
+    "patientSubtitle": "Appointments, your dentist, and visit costs in one place",
+    "admin": "Admin",
+    "doctor": "Doctor",
+    "patientThere": "there",
+    "hi": "Hi, {name}",
+    "dr": "Dr. {name}"
+  },
+  "profile": {
+    "avatarAria": "Your profile and account",
+    "avatarTitle": "Profile"
+  },
+  "language": {
+    "menuAria": "Display language",
+    "useOrgDefault": "Organization default",
+    "preferenceHint": "Your choice is saved to your account."
+  },
+  "adminDashboard": {
+    "title": "Dashboard overview",
+    "todayAppointments": "Today's appointments",
+    "newPatientsMonth": "New patients (month)",
+    "pendingTasks": "Pending tasks",
+    "revenueToday": "Revenue (today)"
+  },
+  "adminSettings": {
+    "title": "Organization settings",
+    "intro": "Configure defaults for every signed-in user. Individual users can still pick their own display language in the header.",
+    "defaultLanguage": "Default display language",
+    "defaultLanguageHelp": "Used when a user has not chosen a personal language. New accounts and the sign-in page follow this default once loaded from the server.",
+    "backDashboard": "← Dashboard"
+  },
+  "adminProfile": {
+    "title": "Your account",
+    "intro": "Signed-in user from the auth service. Open your profile anytime from the round avatar in the header.",
+    "userId": "User ID",
+    "roles": "Roles",
+    "backDashboard": "← Dashboard"
+  }
+}

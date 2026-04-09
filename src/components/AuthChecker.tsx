@@ -7,8 +7,10 @@ import {
   selectCurrentToken,
   selectAuthHydrated,
 } from '@/features/auth/authSlice';
+import { useTranslation } from '@/i18n/I18nContext';
 
 export default function AuthChecker({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
   const token = useAppSelector(selectCurrentToken);
   const hydrated = useAppSelector(selectAuthHydrated);
   const router = useRouter();
@@ -21,7 +23,7 @@ export default function AuthChecker({ children }: { children: React.ReactNode })
   }, [hydrated, token, router]);
 
   if (!hydrated || !token) {
-    return <div className="p-6 text-gray-600">Loading...</div>;
+    return <div className="p-6 text-gray-600">{t('common.loading')}</div>;
   }
 
   return <>{children}</>;

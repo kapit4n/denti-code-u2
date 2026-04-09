@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import LogoutButton from '@/components/LogoutButton';
+import { useTranslation } from '@/i18n/I18nContext';
 
 export type PortalNavItem = { href: string; label: string };
 
@@ -25,6 +26,7 @@ export default function PortalSidebarLayout({
   header,
   children,
 }: Props) {
+  const { t } = useTranslation();
   const pathname = usePathname() ?? '';
   const [sidebarHidden, setSidebarHidden] = useState(false);
 
@@ -66,13 +68,13 @@ export default function PortalSidebarLayout({
       {!sidebarHidden && (
         <aside className="w-56 shrink-0 bg-white border-r border-gray-200 flex flex-col shadow-sm z-20">
           <div className="flex items-center justify-between gap-2 p-4 border-b border-gray-200">
-            <span className="font-bold text-lg text-gray-900 truncate">Denti-Code</span>
+            <span className="font-bold text-lg text-gray-900 truncate">{t('sidebar.brand')}</span>
             <button
               type="button"
               onClick={hideSidebar}
               className="shrink-0 p-1.5 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-              aria-label="Hide navigation panel"
-              title="Hide navigation"
+              aria-label={t('sidebar.hideNav')}
+              title={t('sidebar.hideNavTitle')}
             >
               <svg
                 className="w-5 h-5"
@@ -118,8 +120,8 @@ export default function PortalSidebarLayout({
               type="button"
               onClick={showSidebar}
               className="shrink-0 px-3 border-r border-gray-200 text-gray-600 hover:bg-gray-50 flex items-center justify-center"
-              aria-label="Show navigation panel"
-              title="Show navigation"
+              aria-label={t('sidebar.showNav')}
+              title={t('sidebar.showNavTitle')}
             >
               <svg
                 className="w-6 h-6"

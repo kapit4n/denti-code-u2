@@ -8,6 +8,7 @@ const config: Config = {
     // Lib holds shared Tailwind strings (e.g. appointment status surfaces) — must be scanned or JIT drops them
     "./src/lib/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/features/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/i18n/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {

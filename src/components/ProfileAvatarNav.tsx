@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAppSelector } from '@/lib/redux/hooks';
 import { selectCurrentUser, type AuthUser } from '@/features/auth/authSlice';
 import { profileHrefForRoles } from '@/lib/auth/profileRoutes';
+import { useTranslation } from '@/i18n/I18nContext';
 
 function initialsForUser(user: AuthUser | null): string {
   if (!user) return '?';
@@ -25,6 +26,7 @@ type Props = {
 };
 
 export default function ProfileAvatarNav({ className = '' }: Props) {
+  const { t } = useTranslation();
   const user = useAppSelector(selectCurrentUser);
   const href = profileHrefForRoles(user?.roles);
   const photo = photoForUser(user);
@@ -34,8 +36,8 @@ export default function ProfileAvatarNav({ className = '' }: Props) {
     <Link
       href={href}
       className={`group relative inline-flex shrink-0 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${className}`}
-      aria-label="Your profile and account"
-      title="Profile"
+      aria-label={t('profile.avatarAria')}
+      title={t('profile.avatarTitle')}
     >
       <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-gray-200 bg-gray-100 text-gray-700 shadow-sm transition group-hover:border-blue-300 group-hover:shadow-md">
         {photo ? (

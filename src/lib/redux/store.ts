@@ -5,6 +5,7 @@ import { patientsApiSlice } from '@/features/patients/patientsApiSlice';
 import { appointmentsApiSlice } from '@/features/appointments/appointmentsApiSlice';
 import { doctorsApiSlice } from '@/features/doctors/doctorsApiSlice';
 import { proceduresApiSlice } from '@/features/procedures/proceduresApiSlice';
+import { localeApiSlice } from '@/features/locale/localeApiSlice';
 import {
   setAuthTokenCookie,
   clearAuthTokenCookie,
@@ -33,6 +34,7 @@ export const makeStore = () => {
       [appointmentsApiSlice.reducerPath]: appointmentsApiSlice.reducer,
       [doctorsApiSlice.reducerPath]: doctorsApiSlice.reducer,
       [proceduresApiSlice.reducerPath]: proceduresApiSlice.reducer,
+      [localeApiSlice.reducerPath]: localeApiSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware()
@@ -41,7 +43,8 @@ export const makeStore = () => {
         .concat(patientsApiSlice.middleware)
         .concat(appointmentsApiSlice.middleware)
         .concat(doctorsApiSlice.middleware)
-        .concat(proceduresApiSlice.middleware),
+        .concat(proceduresApiSlice.middleware)
+        .concat(localeApiSlice.middleware),
   });
 };
 
