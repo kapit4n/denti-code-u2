@@ -9,14 +9,18 @@ import { useGetDoctorsQuery } from '@/features/doctors/doctorsApiSlice';
 import { useGetPatientsQuery } from '@/features/patients/patientsApiSlice';
 import {
   addDays,
+  addMonths,
+  formatMonthYearLabel,
   formatWeekRangeLabel,
+  startOfMonth,
   startOfWeekMonday,
 } from '@/lib/doctor/calendarUtils';
 import type { PatientProfile } from '@/types';
 import DoctorWeekView from './_components/DoctorWeekView';
 import DoctorDayDiary from './_components/DoctorDayDiary';
+import DoctorMonthView from './_components/DoctorMonthView';
 
-type ViewMode = 'week' | 'day';
+type ViewMode = 'week' | 'month' | 'day';
 
 export default function DoctorCalendarPage() {
   const user = useAppSelector(selectCurrentUser);
@@ -54,12 +58,27 @@ export default function DoctorCalendarPage() {
   const weekStart = useMemo(() => startOfWeekMonday(cursor), [cursor]);
   const weekEnd = useMemo(() => addDays(weekStart, 6), [weekStart]);
 
+  const monthStart = useMemo(() => startOfMonth(cursor), [cursor]);
+  const monthEndExclusive = useMemo(() => {
+    const x = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
+    x.setHours(0, 0, 0, 0);
+    return x;
+  }, [cursor]);
+
   const goPrev = () => {
-    setCursor((c) => addDays(c, mode === 'week' ? -7 : -1));
+    setCursor((c) => {
+      if (mode === 'week') return addDays(c, -7);
+      if (mode === 'month') return addMonths(c, -1);
+      return addDays(c, -1);
+    });
   };
 
   const goNext = () => {
-    setCursor((c) => addDays(c, mode === 'week' ? 7 : 1));
+    setCursor((c) => {
+      if (mode === 'week') return addDays(c, 7);
+      if (mode === 'month') return addMonths(c, 1);
+      return addDays(c, 1);
+    });
   };
 
   const goToday = () => setCursor(new Date());
@@ -79,6 +98,17 @@ export default function DoctorCalendarPage() {
     return n;
   }, [myAppointments, weekStart]);
 
+  const monthCount = useMemo(() => {
+    const start = monthStart.getTime();
+    const end = monthEndExclusive.getTime();
+    let n = 0;
+    for (const a of myAppointments) {
+      const t = new Date(a.ScheduledDateTime).getTime();
+      if (t >= start && t < end) n += 1;
+    }
+    return n;
+  }, [myAppointments, monthStart, monthEndExclusive]);
+
   const dayCount = useMemo(() => {
     const d = new Date(cursor);
     d.setHours(0, 0, 0, 0);
@@ -89,15 +119,38 @@ export default function DoctorCalendarPage() {
     }).length;
   }, [myAppointments, cursor]);
 
+  const periodLabel =
+    mode === 'week'
+      ? formatWeekRangeLabel(weekStart, weekEnd)
+      : mode === 'month'
+        ? formatMonthYearLabel(cursor)
+        : cursor.toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+          });
+
+  const countLabel =
+    mode === 'week'
+      ? `${weekCount} visit${weekCount === 1 ? '' : 's'} this week`
+      : mode === 'month'
+        ? `${monthCount} visit${monthCount === 1 ? '' : 's'} this month`
+        : `${dayCount} visit${dayCount === 1 ? '' : 's'} this day`;
+
+  const prevAria =
+    mode === 'week' ? 'Previous week' : mode === 'month' ? 'Previous month' : 'Previous day';
+  const nextAria =
+    mode === 'week' ? 'Next week' : mode === 'month' ? 'Next month' : 'Next day';
+
   return (
     <div className="max-w-6xl space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Calendar</h2>
           <p className="text-sm text-gray-600 mt-1 max-w-xl">
-            Your primary visits only. Each block is tinted by status (e.g. amber for in progress,
-            emerald for completed, red for cancelled). Week view shows the full diary; day view lists
-            one day in order.
+            Your primary visits only. Each block is tinted by status. Use Month for workload
+            overview, Week for the diary grid, Day for an ordered list.
           </p>
           <Link
             href="/doctor/dashboard"
@@ -107,7 +160,16 @@ export default function DoctorCalendarPage() {
           </Link>
         </div>
 
-        <div className="flex rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
+        <div className="flex rounded-lg border border-gray-200 bg-white p-1 shadow-sm flex-wrap">
+          <button
+            type="button"
+            onClick={() => setMode('month')}
+            className={`px-3 py-2 text-sm font-medium rounded-md ${
+              mode === 'month' ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            Month
+          </button>
           <button
             type="button"
             onClick={() => setMode('week')}
@@ -145,7 +207,7 @@ export default function DoctorCalendarPage() {
                 type="button"
                 onClick={goPrev}
                 className="px-3 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-medium"
-                aria-label={mode === 'week' ? 'Previous week' : 'Previous day'}
+                aria-label={prevAria}
               >
                 ←
               </button>
@@ -153,7 +215,7 @@ export default function DoctorCalendarPage() {
                 type="button"
                 onClick={goNext}
                 className="px-3 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-medium"
-                aria-label={mode === 'week' ? 'Next week' : 'Next day'}
+                aria-label={nextAria}
               >
                 →
               </button>
@@ -166,31 +228,26 @@ export default function DoctorCalendarPage() {
               </button>
             </div>
             <div className="text-right">
-              <p className="text-sm font-semibold text-gray-900">
-                {mode === 'week'
-                  ? formatWeekRangeLabel(weekStart, weekEnd)
-                  : cursor.toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
-              </p>
-              <p className="text-xs text-gray-500 mt-0.5">
-                {mode === 'week'
-                  ? `${weekCount} visit${weekCount === 1 ? '' : 's'} this week`
-                  : `${dayCount} visit${dayCount === 1 ? '' : 's'} this day`}
-              </p>
+              <p className="text-sm font-semibold text-gray-900">{periodLabel}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{countLabel}</p>
             </div>
           </div>
 
-          {mode === 'week' ? (
+          {mode === 'week' && (
             <DoctorWeekView
               weekStartMonday={weekStart}
               appointments={myAppointments}
               patientById={patientById}
             />
-          ) : (
+          )}
+          {mode === 'month' && (
+            <DoctorMonthView
+              monthAnchor={cursor}
+              appointments={myAppointments}
+              patientById={patientById}
+            />
+          )}
+          {mode === 'day' && (
             <DoctorDayDiary
               day={cursor}
               appointments={myAppointments}
@@ -200,7 +257,7 @@ export default function DoctorCalendarPage() {
 
           {mode === 'day' && (
             <p className="text-xs text-gray-500">
-              Tip: use Week to compare load across the whole diary; use Day for a simple ordered
+              Tip: Month shows density at a glance; Week splits the diary by day; Day is a simple
               list.
             </p>
           )}
