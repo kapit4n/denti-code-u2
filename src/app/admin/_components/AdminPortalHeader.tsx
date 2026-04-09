@@ -9,7 +9,7 @@ export default function AdminPortalHeader() {
   const name = user?.firstName?.trim() || 'Admin';
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+    <header className="px-6 py-4">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <h1 className="text-xl font-semibold text-gray-900">
