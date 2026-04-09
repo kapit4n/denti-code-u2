@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
-export default function DoctorSettingsPage() {
-  redirect('/doctor/dashboard');
+export default function DoctorSettingsRedirectPage() {
+  redirect('/doctor/profile');
 }

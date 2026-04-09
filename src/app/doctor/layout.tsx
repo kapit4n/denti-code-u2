@@ -27,6 +27,9 @@ export default function DoctorLayout({ children }: { children: React.ReactNode }
             <Link href="/doctor/patients" className={navClass}>
               Patients
             </Link>
+            <Link href="/doctor/profile" className={navClass}>
+              Account
+            </Link>
           </nav>
           <div className="p-3 border-t border-gray-200">
             <LogoutButton />

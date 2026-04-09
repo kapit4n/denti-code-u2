@@ -1,14 +1,20 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '@/lib/redux/store';
 
+export type AuthUser = {
+  id: string;
+  email: string;
+  roles: string[];
+  firstName?: string;
+  lastName?: string;
+  /** If the auth profile ever returns a photo URL, it will be used in the header avatar */
+  avatarUrl?: string;
+  imageUrl?: string;
+  photoUrl?: string;
+};
+
 type AuthState = {
-  user: {
-    id: string;
-    email: string;
-    roles: string[];
-    firstName?: string;
-    lastName?: string;
-  } | null;
+  user: AuthUser | null;
   token: string | null;
   /** Client-only: false until cookie/session restore attempt finishes */
   hydrated: boolean;
