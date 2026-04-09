@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { useGetMyAppointmentsQuery } from '@/features/appointments/appointmentsApiSlice';
 import AppointmentsList from './_components/AppointmentsList';
 import AppointmentsSkeleton from './_components/AppointmentsSkeleton';
@@ -10,7 +11,6 @@ export default function AppointmentsPage() {
     data: appointments,
     isLoading,
     isError,
-    error,
   } = useGetMyAppointmentsQuery();
 
   useEffect(() => {
@@ -26,20 +26,42 @@ export default function AppointmentsPage() {
     }
 
     if (isError) {
-      // You can inspect the 'error' object for more details
-      return <div className="text-center text-red-500">Failed to load appointments. Please try again later.</div>;
+      return (
+        <div className="text-center text-red-600 text-sm">
+          Failed to load appointments. Please try again later.
+        </div>
+      );
     }
 
     if (!appointments || appointments.length === 0) {
-      return <div className="text-center text-gray-500">You have no appointments scheduled.</div>;
+      return (
+        <div className="text-center text-gray-500 text-sm space-y-3">
+          <p>You have no visits on file yet.</p>
+          <Link href="/patient/dashboard" className="inline-block text-blue-600 font-medium hover:underline">
+            Back to home
+          </Link>
+        </div>
+      );
     }
 
     return <AppointmentsList appointments={appointments} />;
   };
 
   return (
-    <div>
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">My Appointments</h2>
+    <div className="max-w-3xl">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">Your visits</h2>
+        <p className="text-gray-600 text-sm mt-1">
+          See who you are scheduled with, manage upcoming visits, and review recorded treatment
+          costs.
+        </p>
+        <Link
+          href="/patient/dashboard"
+          className="inline-block mt-3 text-sm font-medium text-blue-600 hover:text-blue-800"
+        >
+          ← Home
+        </Link>
+      </div>
       {renderContent()}
     </div>
   );

@@ -11,7 +11,10 @@ import {
   patientCanCancel,
   patientCanReschedule,
 } from '@/lib/appointments/patientAppointmentActions';
+import { sumRecordedTreatmentTotal } from '@/lib/patient/appointmentCost';
 import type { Appointment } from '@/types';
+
+const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
 interface AppointmentCardProps {
   appointment: Appointment;
@@ -20,6 +23,12 @@ interface AppointmentCardProps {
   patientActions?: boolean;
   /** Deep-link anchor for scrolling from another page (e.g. profile). */
   anchorId?: boolean;
+  /** Primary dentist name, e.g. from clinic directory */
+  doctorLabel?: string;
+  /** Tighter layout for dashboard previews */
+  compact?: boolean;
+  /** Show recorded treatment total when available */
+  showCost?: boolean;
 }
 
 function formatError(err: unknown): string {
@@ -35,6 +44,9 @@ export default function AppointmentCard({
   isPast = false,
   patientActions = false,
   anchorId = true,
+  doctorLabel,
+  compact = false,
+  showCost = false,
 }: AppointmentCardProps) {
   const [updateAppointment, { isLoading }] = useUpdateAppointmentMutation();
   const [actionError, setActionError] = useState('');
@@ -130,16 +142,20 @@ export default function AppointmentCard({
     return d.toISOString().slice(0, 16);
   })();
 
+  const recordedTotal = sumRecordedTreatmentTotal(appointment);
+  const padClass = compact ? 'p-4' : 'p-5';
+  const titleClass = compact ? 'text-base font-bold text-gray-800' : 'text-lg font-bold text-gray-800';
+
   return (
     <div
       id={anchorId ? `patient-appt-${appointment.AppointmentID}` : undefined}
-      className={`bg-white p-5 rounded-lg shadow-md border-l-4 ${
+      className={`bg-white ${padClass} rounded-lg shadow-md border-l-4 ${
         isPast ? 'border-gray-400 opacity-75' : 'border-blue-500'
       }`}
     >
       <div className="flex justify-between items-start gap-4">
         <div className="min-w-0">
-          <p className="text-lg font-bold text-gray-800">
+          <p className={titleClass}>
             {appointment.AppointmentPurpose || 'Appointment'}
           </p>
           <p className="text-sm text-gray-500 mt-1">
@@ -147,20 +163,51 @@ export default function AppointmentCard({
               {appointmentStatusLabel(appointment.Status)}
             </span>
           </p>
+          {doctorLabel ? (
+            <p className="text-sm text-gray-700 mt-2">
+              <span className="text-gray-500">Dentist: </span>
+              {doctorLabel}
+            </p>
+          ) : null}
+          {showCost ? (
+            <p className="text-sm text-gray-600 mt-1.5">
+              {recordedTotal > 0 ? (
+                <>
+                  <span className="text-gray-500">Recorded treatments: </span>
+                  <span className="font-semibold tabular-nums">{money.format(recordedTotal)}</span>
+                </>
+              ) : (
+                <span className="text-gray-500">
+                  {isPast
+                    ? 'No treatments recorded for this visit.'
+                    : 'Costs appear after your visit when the clinic posts treatments.'}
+                </span>
+              )}
+            </p>
+          ) : null}
         </div>
         <div className="text-right shrink-0">
           <p className="text-md font-semibold text-gray-700">{formattedDate}</p>
           <p className="text-md text-gray-600">{formattedTime}</p>
-          <p className="text-xs text-gray-400 mt-1">#{appointment.AppointmentID}</p>
+          {!compact && (
+            <p className="text-xs text-gray-400 mt-1">#{appointment.AppointmentID}</p>
+          )}
         </div>
       </div>
 
       {patientActions && (showAccept || showReschedule || showCancel) && (
-        <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
-          <p className="text-xs text-gray-500">
-            Accept confirms your attendance. Reschedule picks a new time (may need clinic
-            confirmation). Cancel marks the visit as cancelled.
-          </p>
+        <div
+          className={`border-t border-gray-200 space-y-3 ${compact ? 'mt-3 pt-3' : 'mt-4 pt-4'}`}
+        >
+          {!compact && (
+            <p className="text-xs text-gray-500">
+              Accept confirms your attendance. Reschedule picks a new time (may need clinic
+              confirmation). Cancel marks the visit as cancelled.
+            </p>
+          )}
+          {compact && (
+            <p className="text-xs text-gray-500">Accept, reschedule, or cancel this visit.</p>
+          )}
           <div className="flex flex-wrap gap-2">
             {showAccept && (
               <button

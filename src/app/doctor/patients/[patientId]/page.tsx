@@ -12,6 +12,10 @@ import {
   appointmentStatusBadgeClass,
   appointmentStatusLabel,
 } from '@/lib/appointments/appointmentStatus';
+import { formatDobDisplay } from '@/lib/doctor/clinicalFormat';
+import { sumRecordedTreatmentTotal } from '@/lib/patient/appointmentCost';
+
+const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
 export default function DoctorPatientDetailPage() {
   const params = useParams();
@@ -108,64 +112,66 @@ export default function DoctorPatientDetailPage() {
   const profileUnavailable = hasAccess && (patientError || !patient);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-4xl">
       <div>
         <Link href="/doctor/patients" className="text-blue-600 hover:underline text-sm">
           ← Patients
         </Link>
-        <h2 className="text-3xl font-bold text-gray-900 mt-2">
+        <h2 className="text-2xl font-bold text-gray-900 mt-2">
           {patient
             ? `${patient.FirstName} ${patient.LastName}`
             : `Patient #${patientId}`}
         </h2>
-        <p className="text-gray-500 text-sm">Patient ID {patientId}</p>
+        {patient ? (
+          <p className="text-sm text-gray-600 mt-1">
+            {[patient.ContactPhone, patient.Email].filter(Boolean).join(' · ') || 'No phone/email on file'}
+          </p>
+        ) : null}
       </div>
 
       {profileUnavailable ? (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-900 text-sm">
-          Patient profile could not be loaded (record may be missing in the patients service).
-          Appointment history with you is still shown below.
+          Demographics not loaded; visit list with you is still available below.
         </div>
       ) : patient ? (
-        <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Profile</h3>
-          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+        <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+          <h3 className="text-base font-semibold text-gray-900 mb-4">Chart snapshot</h3>
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
             <div>
               <dt className="text-gray-500">Date of birth</dt>
-              <dd className="font-medium text-gray-900">{patient.DateOfBirth}</dd>
-            </div>
-            <div>
-              <dt className="text-gray-500">Gender</dt>
-              <dd className="font-medium text-gray-900">{patient.Gender || '—'}</dd>
-            </div>
-            <div>
-              <dt className="text-gray-500">Email</dt>
-              <dd className="font-medium text-gray-900">{patient.Email || '—'}</dd>
+              <dd className="font-medium text-gray-900 mt-0.5">
+                {formatDobDisplay(patient.DateOfBirth)}
+              </dd>
             </div>
             <div>
               <dt className="text-gray-500">Phone</dt>
-              <dd className="font-medium text-gray-900">{patient.ContactPhone}</dd>
+              <dd className="font-medium text-gray-900 mt-0.5">{patient.ContactPhone || '—'}</dd>
             </div>
             <div className="sm:col-span-2">
-              <dt className="text-gray-500">Address</dt>
-              <dd className="font-medium text-gray-900">{patient.Address || '—'}</dd>
+              <dt className="text-gray-500">Email</dt>
+              <dd className="font-medium text-gray-900 mt-0.5">{patient.Email || '—'}</dd>
             </div>
+            {patient.Address ? (
+              <div className="sm:col-span-2">
+                <dt className="text-gray-500">Address</dt>
+                <dd className="text-gray-900 mt-0.5">{patient.Address}</dd>
+              </div>
+            ) : null}
             <div className="sm:col-span-2">
-              <dt className="text-gray-500">Medical history summary</dt>
-              <dd className="text-gray-800">{patient.MedicalHistorySummary || '—'}</dd>
+              <dt className="text-gray-500">Health notes</dt>
+              <dd className="text-gray-800 mt-0.5 whitespace-pre-wrap">
+                {patient.MedicalHistorySummary?.trim() || '—'}
+              </dd>
             </div>
           </dl>
         </section>
       ) : null}
 
       <section className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800">
-            Appointments with you ({patientAppointments.length})
+        <div className="px-5 py-4 border-b border-gray-100">
+          <h3 className="text-base font-semibold text-gray-900">
+            Visits with you ({patientAppointments.length})
           </h3>
-          <p className="text-xs text-gray-500 mt-1">
-            Only visits where you are listed as primary doctor.
-          </p>
         </div>
         {patientAppointments.length === 0 ? (
           <p className="p-6 text-gray-500 text-sm">No appointments found.</p>
@@ -177,12 +183,14 @@ export default function DoctorPatientDetailPage() {
                   <th className="px-4 py-3 font-medium">When</th>
                   <th className="px-4 py-3 font-medium">Purpose</th>
                   <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 w-44" />
+                  <th className="px-4 py-3 font-medium text-right">Recorded</th>
+                  <th className="px-4 py-3 w-24" />
                 </tr>
               </thead>
               <tbody>
                 {patientAppointments.map((a) => {
                   const when = new Date(a.ScheduledDateTime);
+                  const rec = sumRecordedTreatmentTotal(a);
                   return (
                     <tr key={a.AppointmentID} className="border-b border-gray-100">
                       <td className="px-4 py-3 text-gray-800">
@@ -199,12 +207,15 @@ export default function DoctorPatientDetailPage() {
                           {appointmentStatusLabel(a.Status)}
                         </span>
                       </td>
+                      <td className="px-4 py-3 text-right tabular-nums text-gray-800">
+                        {rec > 0 ? money.format(rec) : '—'}
+                      </td>
                       <td className="px-4 py-3">
                         <Link
                           href={`/doctor/appointments/${a.AppointmentID}`}
-                          className="text-blue-600 hover:text-blue-800 font-medium"
+                          className="text-blue-600 hover:text-blue-800 font-medium text-sm"
                         >
-                          Treatments & costs
+                          Open →
                         </Link>
                       </td>
                     </tr>

@@ -1,7 +1,5 @@
-export default function SettingsPage() {
-  return (
-    <div>
-      Settings
-    </div>
-  );
+import { redirect } from 'next/navigation';
+
+export default function PatientSettingsPage() {
+  redirect('/patient/profile');
 }

@@ -33,10 +33,7 @@ export default function DoctorPatientsPage() {
   }, [appointments, clinicDoctor]);
 
   const treatedPatients = useMemo((): TreatedPatient[] => {
-    const byPatient = new Map<
-      number,
-      { count: number; last: Date | null }
-    >();
+    const byPatient = new Map<number, { count: number; last: Date | null }>();
     for (const a of myAppointments) {
       const cur = byPatient.get(a.PatientID) ?? { count: 0, last: null };
       cur.count += 1;
@@ -69,37 +66,49 @@ export default function DoctorPatientsPage() {
 
   if (loading) {
     return (
-      <div>
-        <h2 className="text-3xl font-bold mb-6 text-gray-800">Patients</h2>
-        <p className="text-gray-500">Loading…</p>
+      <div className="max-w-4xl">
+        <h2 className="text-2xl font-bold text-gray-900">Patients</h2>
+        <p className="text-gray-500 text-sm mt-4">Loading…</p>
       </div>
     );
   }
 
   if (!clinicDoctor) {
     return (
-      <div>
-        <h2 className="text-3xl font-bold mb-6 text-gray-800">Patients</h2>
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-amber-900 text-sm">
-          No clinic doctor profile matches your login. Use a seeded doctor account to view patients
-          you have treated.
-        </div>
+      <div className="max-w-4xl space-y-4">
+        <h2 className="text-2xl font-bold text-gray-900">Patients</h2>
+        <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+          Link your login to a clinic doctor record to see patients you treat.
+        </p>
+        <Link href="/doctor/dashboard" className="text-sm font-medium text-blue-600 hover:underline">
+          ← Home
+        </Link>
       </div>
     );
   }
 
   return (
-    <div>
-      <h2 className="text-3xl font-bold mb-2 text-gray-800">Patients you treat</h2>
-      <p className="text-gray-600 text-sm mb-6">
-        Patients with at least one appointment where you are the primary doctor. Open a row for
-        profile details and full appointment history with you.
-      </p>
+    <div className="max-w-4xl space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900">Patients you treat</h2>
+        <p className="text-gray-600 text-sm mt-1">
+          Everyone with at least one visit where you are the primary dentist.
+        </p>
+        <Link
+          href="/doctor/dashboard"
+          className="inline-block mt-2 text-sm font-medium text-blue-600 hover:text-blue-800"
+        >
+          ← Home
+        </Link>
+      </div>
 
       {treatedPatients.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-500">
-          No patients yet. Create an appointment from the Appointments page to link a patient to
-          your practice.
+        <div className="bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-500 text-sm">
+          No patients yet. Book a visit from{' '}
+          <Link href="/doctor/appointments" className="text-blue-600 font-medium hover:underline">
+            Visits
+          </Link>
+          .
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -107,10 +116,10 @@ export default function DoctorPatientsPage() {
             <thead className="bg-gray-50 text-gray-600 border-b border-gray-200">
               <tr>
                 <th className="px-4 py-3 font-medium">Patient</th>
-                <th className="px-4 py-3 font-medium">Patient ID</th>
-                <th className="px-4 py-3 font-medium text-right">Appointments with you</th>
-                <th className="px-4 py-3 font-medium">Last visit</th>
-                <th className="px-4 py-3 w-40" />
+                <th className="px-4 py-3 font-medium">Phone</th>
+                <th className="px-4 py-3 font-medium text-right">Visits with you</th>
+                <th className="px-4 py-3 font-medium">Last seen</th>
+                <th className="px-4 py-3 w-28" />
               </tr>
             </thead>
             <tbody>
@@ -120,13 +129,17 @@ export default function DoctorPatientsPage() {
                     <span className="font-medium text-gray-900">
                       {row.profile
                         ? `${row.profile.FirstName} ${row.profile.LastName}`
-                        : `Unknown patient`}
+                        : 'Unknown name'}
                     </span>
                     {row.profile?.Email ? (
-                      <div className="text-xs text-gray-500">{row.profile.Email}</div>
+                      <div className="text-xs text-gray-500 truncate max-w-[200px]">
+                        {row.profile.Email}
+                      </div>
                     ) : null}
                   </td>
-                  <td className="px-4 py-3 text-gray-600 tabular-nums">{row.patientId}</td>
+                  <td className="px-4 py-3 text-gray-600 tabular-nums">
+                    {row.profile?.ContactPhone || '—'}
+                  </td>
                   <td className="px-4 py-3 text-right tabular-nums font-medium">
                     {row.appointmentCount}
                   </td>
@@ -142,9 +155,9 @@ export default function DoctorPatientsPage() {
                   <td className="px-4 py-3">
                     <Link
                       href={`/doctor/patients/${row.patientId}`}
-                      className="text-blue-600 hover:text-blue-800 font-medium"
+                      className="text-blue-600 hover:text-blue-800 font-medium text-sm"
                     >
-                      View details →
+                      Open →
                     </Link>
                   </td>
                 </tr>

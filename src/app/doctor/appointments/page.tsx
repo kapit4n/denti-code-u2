@@ -6,6 +6,7 @@ import { selectCurrentUser } from '@/features/auth/authSlice';
 import { useGetAppointmentsQuery } from '@/features/appointments/appointmentsApiSlice';
 import { useGetDoctorsQuery } from '@/features/doctors/doctorsApiSlice';
 import { useGetPatientsQuery } from '@/features/patients/patientsApiSlice';
+import Link from 'next/link';
 import type { PatientProfile } from '@/types';
 import DoctorAppointmentsList from './_components/DoctorAppointmentsList';
 import CreateAppointmentModal from './_components/CreateAppointmentModal';
@@ -28,9 +29,7 @@ export default function DoctorAppointmentsPage() {
 
   const clinicDoctor = useMemo(() => {
     if (!user?.email) return undefined;
-    return doctors.find(
-      (d) => d.Email.toLowerCase() === user.email.toLowerCase(),
-    );
+    return doctors.find((d) => d.Email.toLowerCase() === user.email.toLowerCase());
   }, [doctors, user?.email]);
 
   const doctorAppointments = useMemo(() => {
@@ -50,58 +49,68 @@ export default function DoctorAppointmentsPage() {
 
   if (loading) {
     return (
-      <div>
-        <h2 className="text-3xl font-bold mb-6 text-gray-800">Appointments</h2>
-        <p className="text-gray-500">Loading…</p>
+      <div className="max-w-4xl">
+        <h2 className="text-2xl font-bold text-gray-900">Visits</h2>
+        <p className="text-gray-500 text-sm mt-4">Loading…</p>
       </div>
     );
   }
 
   if (doctorsError || apptsError) {
     return (
-      <div>
-        <h2 className="text-3xl font-bold mb-6 text-gray-800">Appointments</h2>
-        <p className="text-red-600">Failed to load data. Please try again.</p>
+      <div className="max-w-4xl">
+        <h2 className="text-2xl font-bold text-gray-900">Visits</h2>
+        <p className="text-red-600 text-sm mt-4">Could not load data. Try again.</p>
       </div>
     );
   }
 
   if (!clinicDoctor) {
     return (
-      <div>
-        <h2 className="text-3xl font-bold mb-6 text-gray-800">Appointments</h2>
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-amber-900">
-          <p className="font-medium">No clinic profile for this account</p>
-          <p className="text-sm mt-1">
-            Your login email must match a doctor record in the clinic service (e.g. seeded
-            doctors <code className="text-xs bg-amber-100 px-1 rounded">susan.storm@denti-code.com</code> or{' '}
-            <code className="text-xs bg-amber-100 px-1 rounded">peter.parker@denti-code.com</code>).
+      <div className="max-w-4xl space-y-4">
+        <h2 className="text-2xl font-bold text-gray-900">Visits</h2>
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-amber-900 text-sm">
+          <p className="font-medium">No clinic profile for this login</p>
+          <p className="mt-1 text-amber-800/90">
+            Use a doctor email registered in the clinic service (see README seed users).
           </p>
         </div>
+        <Link href="/doctor/dashboard" className="text-sm font-medium text-blue-600 hover:underline">
+          ← Home
+        </Link>
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <h2 className="text-3xl font-bold text-gray-800">My appointments</h2>
+    <div className="max-w-4xl space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Visits</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            {doctorAppointments.length} as your primary visits ·{' '}
+            <span className="text-gray-500">
+              Dr. {clinicDoctor.FirstName} {clinicDoctor.LastName}
+            </span>
+          </p>
+          <Link
+            href="/doctor/dashboard"
+            className="inline-block mt-2 text-sm font-medium text-blue-600 hover:text-blue-800"
+          >
+            ← Home
+          </Link>
+        </div>
         <button
           type="button"
           onClick={() => setShowCreate(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg"
+          className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 px-4 rounded-lg shrink-0"
         >
-          New appointment
+          New visit
         </button>
       </div>
-      <p className="text-sm text-gray-600 mb-6">
-        Signed in as Dr. {clinicDoctor.FirstName} {clinicDoctor.LastName} — showing{' '}
-        {doctorAppointments.length} appointment(s) where you are the primary doctor.
-      </p>
-      <DoctorAppointmentsList
-        appointments={doctorAppointments}
-        patientById={patientById}
-      />
+
+      <DoctorAppointmentsList appointments={doctorAppointments} patientById={patientById} />
+
       <CreateAppointmentModal
         open={showCreate}
         onClose={() => setShowCreate(false)}

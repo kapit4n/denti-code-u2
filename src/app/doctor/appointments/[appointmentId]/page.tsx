@@ -171,7 +171,7 @@ export default function DoctorAppointmentDetailPage() {
     return (
       <div className="space-y-4">
         <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
-          ← Back to appointments
+          ← Visits
         </Link>
         <p className="text-red-600">Invalid appointment.</p>
       </div>
@@ -182,7 +182,7 @@ export default function DoctorAppointmentDetailPage() {
     return (
       <div>
         <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
-          ← Back to appointments
+          ← Visits
         </Link>
         <p className="mt-4 text-gray-500">Loading appointment…</p>
       </div>
@@ -193,7 +193,7 @@ export default function DoctorAppointmentDetailPage() {
     return (
       <div>
         <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
-          ← Back to appointments
+          ← Visits
         </Link>
         <p className="mt-4 text-red-600">
           Could not load appointment.
@@ -209,7 +209,7 @@ export default function DoctorAppointmentDetailPage() {
     return (
       <div>
         <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
-          ← Back to appointments
+          ← Visits
         </Link>
         <p className="mt-4 text-amber-800">No clinic doctor profile for your account.</p>
       </div>
@@ -220,7 +220,7 @@ export default function DoctorAppointmentDetailPage() {
     return (
       <div>
         <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
-          ← Back to appointments
+          ← Visits
         </Link>
         <p className="mt-4 text-amber-800">
           You can only record treatments for appointments where you are the primary doctor.
@@ -235,21 +235,28 @@ export default function DoctorAppointmentDetailPage() {
     <div className="space-y-8">
       <div>
         <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
-          ← Back to appointments
+          ← Visits
         </Link>
-        <h2 className="text-3xl font-bold text-gray-900 mt-2">Appointment details</h2>
-        <p className="text-gray-500 text-sm mt-1">#{appointment.AppointmentID}</p>
+        <h2 className="text-2xl font-bold text-gray-900 mt-2">Visit</h2>
+        <p className="text-gray-500 text-xs mt-1">Ref #{appointment.AppointmentID}</p>
       </div>
 
       <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Visit summary</h3>
+        <h3 className="text-base font-semibold text-gray-900 mb-4">Summary</h3>
         <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <div>
             <dt className="text-gray-500">Patient</dt>
-            <dd className="font-medium text-gray-900">
-              {patient
-                ? `${patient.FirstName} ${patient.LastName}`
-                : `Patient ID ${appointment.PatientID}`}
+            <dd className="font-medium text-gray-900 mt-0.5">
+              {patient ? (
+                <Link
+                  href={`/doctor/patients/${appointment.PatientID}`}
+                  className="text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  {patient.FirstName} {patient.LastName}
+                </Link>
+              ) : (
+                `Patient ID ${appointment.PatientID}`
+              )}
             </dd>
           </div>
           <div>
@@ -287,8 +294,8 @@ export default function DoctorAppointmentDetailPage() {
             </dd>
             {statusError ? <p className="text-sm text-red-600 mt-2">{statusError}</p> : null}
             <p className="text-xs text-gray-500 mt-2">
-              Typical flow: Scheduled → Confirmed → In progress → Completed. Use Cancelled or No-show
-              when the visit does not complete as planned.
+              Flow: scheduled → confirmed → in progress → completed; cancel or no-show if the visit
+              does not finish as planned.
             </p>
           </div>
           <div>
@@ -308,7 +315,7 @@ export default function DoctorAppointmentDetailPage() {
 
       <section className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-gray-100 flex flex-wrap justify-between items-center gap-4">
-          <h3 className="text-lg font-semibold text-gray-800">Treatments performed</h3>
+          <h3 className="text-base font-semibold text-gray-900">Treatments recorded</h3>
           <p className="text-lg font-bold text-gray-900">
             Total: {money.format(totalCost)}
           </p>
@@ -371,7 +378,7 @@ export default function DoctorAppointmentDetailPage() {
       </section>
 
       <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Register a treatment</h3>
+        <h3 className="text-base font-semibold text-gray-900 mb-4">Add treatment line</h3>
         <form onSubmit={handleAddTreatment} className="space-y-4 max-w-xl">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="proc">

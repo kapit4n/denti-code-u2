@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useGetMyProfileQuery } from '@/features/patients/patientsApiSlice';
 import ProfileView from './_components/ProfileView';
 import ProfileForm from './_components/ProfileForm';
 import ProfileSkeleton from './_components/ProfileSkeleton';
-import PatientProfileAppointments from './_components/PatientProfileAppointments';
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -21,33 +21,44 @@ export default function ProfilePage() {
     }
 
     if (isError || !profile) {
-      return <div className="text-center text-red-500">Could not load your profile. Please try again.</div>;
+      return (
+        <div className="text-center text-red-600 text-sm">
+          Could not load your details. Please try again.
+        </div>
+      );
     }
 
     if (isEditing) {
-      return <ProfileForm profile={profile} onSaveSuccess={handleEditSuccess} onCancel={() => setIsEditing(false)} />;
+      return (
+        <ProfileForm
+          profile={profile}
+          onSaveSuccess={handleEditSuccess}
+          onCancel={() => setIsEditing(false)}
+        />
+      );
     }
 
     return <ProfileView profile={profile} onEdit={() => setIsEditing(true)} />;
   };
 
   return (
-    <div className="space-y-10">
+    <div className="max-w-2xl space-y-6">
       <div>
-        <h2 className="text-3xl font-bold mb-6 text-gray-800">My Profile</h2>
-        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-          {renderContent()}
-        </div>
-      </div>
-
-      <section className="border-t border-gray-200 pt-8">
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">Your appointments</h3>
-        <p className="text-sm text-gray-600 mb-4">
-          Upcoming visits booked for you. Accept to confirm, reschedule for a new time, or cancel
-          if you cannot attend.
+        <h2 className="text-2xl font-bold text-gray-900">Your details</h2>
+        <p className="text-gray-600 text-sm mt-1">
+          Contact information and health notes your care team uses. Appointments and costs live
+          under{' '}
+          <Link href="/patient/dashboard" className="text-blue-600 font-medium hover:underline">
+            Home
+          </Link>{' '}
+          and{' '}
+          <Link href="/patient/appointments" className="text-blue-600 font-medium hover:underline">
+            Visits
+          </Link>
+          .
         </p>
-        <PatientProfileAppointments />
-      </section>
+      </div>
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">{renderContent()}</div>
     </div>
   );
 }

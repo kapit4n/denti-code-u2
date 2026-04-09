@@ -73,7 +73,7 @@ export default function CreateAppointmentModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b flex justify-between items-center">
-          <h3 className="text-xl font-semibold text-gray-800">New appointment</h3>
+          <h3 className="text-xl font-semibold text-gray-800">Book visit</h3>
           <button
             type="button"
             onClick={onClose}
@@ -194,7 +194,7 @@ export default function CreateAppointmentModal({
               disabled={isLoading || patients.length === 0}
               className="flex-1 py-2 px-4 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 disabled:opacity-50"
             >
-              {isLoading ? 'Creating…' : 'Create appointment'}
+              {isLoading ? 'Saving…' : 'Book visit'}
             </button>
           </div>
         </form>

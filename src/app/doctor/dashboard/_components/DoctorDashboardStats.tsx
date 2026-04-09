@@ -92,10 +92,9 @@ export default function DoctorDashboardStats() {
 
   if (!clinicDoctor) {
     return (
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-amber-900 text-sm">
-        No clinic doctor profile matches your login email. Use a seeded doctor account (e.g.
-        susan.storm@denti-code.com) to see dashboard metrics.
-      </div>
+      <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+        Metrics appear when your account is linked to a clinic doctor record.
+      </p>
     );
   }
 
@@ -152,9 +151,9 @@ export default function DoctorDashboardStats() {
       </div>
 
       <p className="text-xs text-gray-500">
-        Metrics use appointments where you are the primary doctor. Revenue sums treatment line
-        totals on <strong>completed</strong> visits only. Pending counts are{' '}
-        <strong>scheduled</strong> or <strong>confirmed</strong> visits in the selected period.
+        <strong>Completed</strong> drives revenue and patients attended. <strong>Pending</strong>{' '}
+        includes scheduled, confirmed, in progress, and rescheduled visits in range (not completed,
+        cancelled, or no-show).
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -167,7 +166,7 @@ export default function DoctorDashboardStats() {
         <StatCard
           title="Pending appointments"
           value={stats.pendingCount}
-          subtitle="Scheduled or confirmed in range"
+          subtitle="Active pipeline in range"
           accent="amber"
         />
         <StatCard
@@ -186,9 +185,9 @@ export default function DoctorDashboardStats() {
           accent="violet"
         />
         <StatCard
-          title="All appointments in period"
+          title="Visits in period"
           value={stats.appointmentsInRange}
-          subtitle="Including cancelled / no-show"
+          subtitle="All statuses in selected range"
           accent="slate"
         />
       </div>
