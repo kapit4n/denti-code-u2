@@ -93,12 +93,14 @@ export default function DoctorAppointmentsPage() {
               Dr. {clinicDoctor.FirstName} {clinicDoctor.LastName}
             </span>
           </p>
-          <Link
-            href="/doctor/dashboard"
-            className="inline-block mt-2 text-sm font-medium text-blue-600 hover:text-blue-800"
-          >
-            ← Home
-          </Link>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm font-medium">
+            <Link href="/doctor/dashboard" className="text-blue-600 hover:text-blue-800">
+              ← Home
+            </Link>
+            <Link href="/doctor/calendar" className="text-blue-600 hover:text-blue-800">
+              Week / day calendar →
+            </Link>
+          </div>
         </div>
         <button
           type="button"

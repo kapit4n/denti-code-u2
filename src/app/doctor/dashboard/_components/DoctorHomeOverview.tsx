@@ -81,6 +81,12 @@ export default function DoctorHomeOverview() {
           Visits &amp; new booking
         </Link>
         <Link
+          href="/doctor/calendar"
+          className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
+        >
+          Week / day calendar
+        </Link>
+        <Link
           href="/doctor/patients"
           className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
         >

@@ -52,3 +52,33 @@ export function isAppointmentPending(status: AppointmentStatus): boolean {
     status === 'Rescheduled'
   );
 }
+
+/**
+ * Tinted surface for calendar / agenda blocks (background + border + hover).
+ * Unknown API values fall back to neutral gray.
+ */
+export function appointmentStatusCalendarSurfaceClass(status: string): string {
+  const isKnown = (APPOINTMENT_STATUSES as readonly string[]).includes(status);
+  if (!isKnown) {
+    return 'bg-gray-50 border-gray-300/80 hover:bg-gray-100/90';
+  }
+
+  const byStatus: Record<AppointmentStatus, string> = {
+    Scheduled:
+      'bg-slate-50 border-slate-300/80 hover:bg-slate-100/90',
+    Confirmed:
+      'bg-sky-50 border-sky-300/80 hover:bg-sky-100/90',
+    InProgress:
+      'bg-amber-50 border-amber-300/80 hover:bg-amber-100/90',
+    Completed:
+      'bg-emerald-50 border-emerald-300/80 hover:bg-emerald-100/90',
+    Cancelled:
+      'bg-red-50 border-red-300/80 hover:bg-red-100/90',
+    NoShow:
+      'bg-orange-50 border-orange-300/80 hover:bg-orange-100/90',
+    Rescheduled:
+      'bg-violet-50 border-violet-300/80 hover:bg-violet-100/90',
+  };
+
+  return byStatus[status as AppointmentStatus];
+}

@@ -21,6 +21,9 @@ export default function DoctorLayout({ children }: { children: React.ReactNode }
             <Link href="/doctor/appointments" className={navClass}>
               Visits
             </Link>
+            <Link href="/doctor/calendar" className={navClass}>
+              Calendar
+            </Link>
             <Link href="/doctor/patients" className={navClass}>
               Patients
             </Link>
