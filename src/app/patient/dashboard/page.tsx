@@ -8,10 +8,12 @@ import { useGetMyProfileQuery } from '@/features/patients/patientsApiSlice';
 import AppointmentCard from '@/app/patient/appointments/_components/AppointmentCard';
 import PatientInfoSummary from '@/app/patient/_components/PatientInfoSummary';
 import { sumRecordedTreatmentTotal } from '@/lib/patient/appointmentCost';
+import { useTranslation } from '@/i18n/I18nContext';
 
 const UPCOMING_PREVIEW = 4;
 
 export default function PatientDashboardPage() {
+  const { t } = useTranslation();
   const { data: profile, isLoading: profileLoading, isError: profileError } = useGetMyProfileQuery();
   const { data: appointments = [], isLoading: apptLoading, isError: apptError } =
     useGetMyAppointmentsQuery();
@@ -20,10 +22,11 @@ export default function PatientDashboardPage() {
   const doctorById = useMemo(() => {
     const m = new Map<number, string>();
     for (const d of doctors) {
-      m.set(d.DoctorID, `Dr. ${d.FirstName} ${d.LastName}`);
+      const name = `${d.FirstName} ${d.LastName}`.trim();
+      m.set(d.DoctorID, t('portal.dr', { name }));
     }
     return m;
-  }, [doctors]);
+  }, [doctors, t]);
 
   const upcoming = useMemo(() => {
     const n = new Date();
@@ -47,19 +50,16 @@ export default function PatientDashboardPage() {
   return (
     <div className="space-y-8 max-w-6xl">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Home</h2>
-        <p className="text-gray-600 text-sm mt-1">
-          What matters for your care: who you are on file, who is seeing you next, and what has been
-          billed to the visit so far.
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('patientPortal.dashboard.title')}</h2>
+        <p className="text-gray-600 text-sm mt-1">{t('patientPortal.dashboard.intro')}</p>
       </div>
 
       {loading && (
-        <p className="text-gray-500 text-sm">Loading your overview…</p>
+        <p className="text-gray-500 text-sm">{t('patientPortal.dashboard.loading')}</p>
       )}
 
       {!loading && profileError && (
-        <p className="text-red-600 text-sm">We could not load your profile.</p>
+        <p className="text-red-600 text-sm">{t('patientPortal.dashboard.profileError')}</p>
       )}
 
       {!loading && !profileError && profile && (
@@ -68,24 +68,23 @@ export default function PatientDashboardPage() {
 
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
             <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">Upcoming visits</h2>
+              <h2 className="text-lg font-semibold text-gray-900">
+                {t('patientPortal.dashboard.upcomingTitle')}
+              </h2>
               <Link
                 href="/patient/appointments"
                 className="text-sm font-medium text-blue-600 hover:text-blue-800"
               >
-                All visits →
+                {t('patientPortal.dashboard.allVisits')}
               </Link>
             </div>
 
             {apptError && (
-              <p className="text-sm text-red-600">Appointments could not be loaded.</p>
+              <p className="text-sm text-red-600">{t('patientPortal.dashboard.apptLoadError')}</p>
             )}
 
             {!apptError && upcomingPreview.length === 0 && (
-              <p className="text-sm text-gray-500">
-                No upcoming visits. When the clinic schedules you, they will show here with your
-                dentist and any recorded costs after treatment.
-              </p>
+              <p className="text-sm text-gray-500">{t('patientPortal.dashboard.noUpcoming')}</p>
             )}
 
             {!apptError && upcomingPreview.length > 0 && (
@@ -98,7 +97,7 @@ export default function PatientDashboardPage() {
                       compact
                       doctorLabel={
                         doctorById.get(appt.PrimaryDoctorID) ??
-                        `Primary dentist (clinic ID ${appt.PrimaryDoctorID})`
+                        t('patientPortal.primaryDentistFallback', { id: appt.PrimaryDoctorID })
                       }
                       showCost
                     />
@@ -109,8 +108,7 @@ export default function PatientDashboardPage() {
 
             {!apptError && recordedTotalsUpcoming > 0 && (
               <p className="text-xs text-gray-500 mt-3 border-t border-gray-100 pt-3">
-                Subtotals above are from treatments already posted to those visits. Final statements
-                may come from the front desk.
+                {t('patientPortal.dashboard.subtotalNote')}
               </p>
             )}
           </div>
@@ -119,20 +117,20 @@ export default function PatientDashboardPage() {
 
       <section className="border-t border-gray-200 pt-6">
         <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
-          Quick links
+          {t('patientPortal.dashboard.quickLinks')}
         </h3>
         <div className="flex flex-wrap gap-3">
           <Link
             href="/patient/appointments"
             className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
           >
-            Full visit list &amp; history
+            {t('patientPortal.dashboard.linkFullList')}
           </Link>
           <Link
             href="/patient/profile"
             className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
           >
-            Update contact &amp; health notes
+            {t('patientPortal.dashboard.linkProfile')}
           </Link>
         </div>
       </section>

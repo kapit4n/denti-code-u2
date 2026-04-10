@@ -292,5 +292,103 @@
       "userId": "User ID",
       "roles": "Roles"
     }
+  },
+  "patientPortal": {
+    "nav": {
+      "backHome": "← Home"
+    },
+    "emptyDash": "—",
+    "notProvided": "Not provided",
+    "primaryDentistFallback": "Primary dentist (clinic ID {id})",
+    "field": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "dob": "Date of birth",
+      "address": "Address"
+    },
+    "dashboard": {
+      "title": "Home",
+      "intro": "What matters for your care: who you are on file, who is seeing you next, and what has been billed to the visit so far.",
+      "loading": "Loading your overview…",
+      "profileError": "We could not load your profile.",
+      "upcomingTitle": "Upcoming visits",
+      "allVisits": "All visits →",
+      "apptLoadError": "Appointments could not be loaded.",
+      "noUpcoming": "No upcoming visits. When the clinic schedules you, they will show here with your dentist and any recorded costs after treatment.",
+      "subtotalNote": "Subtotals above are from treatments already posted to those visits. Final statements may come from the front desk.",
+      "quickLinks": "Quick links",
+      "linkFullList": "Full visit list & history",
+      "linkProfile": "Update contact & health notes"
+    },
+    "infoSummary": {
+      "title": "Your information",
+      "editDetails": "Edit details"
+    },
+    "appointmentsPage": {
+      "title": "Your visits",
+      "intro": "See who you are scheduled with, manage upcoming visits, and review recorded treatment costs.",
+      "loadError": "Failed to load appointments. Please try again later.",
+      "empty": "You have no visits on file yet.",
+      "backHome": "Back to home"
+    },
+    "list": {
+      "upcoming": "Upcoming",
+      "upcomingHelp": "Your dentist, visit status, and any treatment totals already posted for that appointment.",
+      "noUpcoming": "No upcoming appointments.",
+      "past": "Past visits",
+      "pastHelp": "Completed or past-dated visits and recorded treatment amounts when available.",
+      "noPast": "No past visits yet."
+    },
+    "card": {
+      "visitFallback": "Appointment",
+      "dentist": "Dentist:",
+      "recordedTreatments": "Recorded treatments:",
+      "noCostPast": "No treatments recorded for this visit.",
+      "noCostUpcoming": "Costs appear after your visit when the clinic posts treatments.",
+      "helpFull": "Accept confirms your attendance. Reschedule picks a new time (may need clinic confirmation). Cancel marks the visit as cancelled.",
+      "helpCompact": "Accept, reschedule, or cancel this visit.",
+      "accept": "Accept",
+      "reschedule": "Reschedule",
+      "cancel": "Cancel",
+      "cancelConfirm": "Cancel this appointment? The clinic will see it as cancelled.",
+      "errGeneric": "Something went wrong. Please try again.",
+      "errPickTime": "Choose a new date and time.",
+      "errFuture": "Pick a future date and time.",
+      "rescheduleTitle": "Reschedule appointment",
+      "rescheduleIntro": "Choose a new date and time. Status will return to \"Scheduled\" until the clinic confirms.",
+      "newDateTime": "New date & time",
+      "close": "Close",
+      "saveNewTime": "Save new time",
+      "ref": "#{id}"
+    },
+    "profilePage": {
+      "title": "Your details",
+      "introBefore": "Contact information and health notes your care team uses. Appointments and costs live under ",
+      "introBetween": " and ",
+      "introAfter": ".",
+      "loadError": "Could not load your details. Please try again."
+    },
+    "profileView": {
+      "sectionTitle": "Contact & health notes",
+      "edit": "Edit",
+      "emailHint": "Used to sign in; change via clinic if needed.",
+      "healthNotesTitle": "Health notes for your care team",
+      "healthNotesEmpty": "None on file — add anything your dentist should know (allergies, conditions, medications)."
+    },
+    "profileForm": {
+      "title": "Edit your details",
+      "intro": "Update what the front desk and clinical team should use to reach you and document your care.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "contactPhone": "Contact phone",
+      "address": "Address",
+      "healthNotes": "Health notes for your care team",
+      "healthPlaceholder": "Allergies, medications, conditions…",
+      "saveError": "Failed to save. Please try again.",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving…"
+    }
   }
 }

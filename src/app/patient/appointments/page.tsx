@@ -3,10 +3,12 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { useGetMyAppointmentsQuery } from '@/features/appointments/appointmentsApiSlice';
+import { useTranslation } from '@/i18n/I18nContext';
 import AppointmentsList from './_components/AppointmentsList';
 import AppointmentsSkeleton from './_components/AppointmentsSkeleton';
 
 export default function AppointmentsPage() {
+  const { t } = useTranslation();
   const {
     data: appointments,
     isLoading,
@@ -28,7 +30,7 @@ export default function AppointmentsPage() {
     if (isError) {
       return (
         <div className="text-center text-red-600 text-sm">
-          Failed to load appointments. Please try again later.
+          {t('patientPortal.appointmentsPage.loadError')}
         </div>
       );
     }
@@ -36,9 +38,9 @@ export default function AppointmentsPage() {
     if (!appointments || appointments.length === 0) {
       return (
         <div className="text-center text-gray-500 text-sm space-y-3">
-          <p>You have no visits on file yet.</p>
+          <p>{t('patientPortal.appointmentsPage.empty')}</p>
           <Link href="/patient/dashboard" className="inline-block text-blue-600 font-medium hover:underline">
-            Back to home
+            {t('patientPortal.appointmentsPage.backHome')}
           </Link>
         </div>
       );
@@ -50,16 +52,13 @@ export default function AppointmentsPage() {
   return (
     <div className="max-w-3xl">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Your visits</h2>
-        <p className="text-gray-600 text-sm mt-1">
-          See who you are scheduled with, manage upcoming visits, and review recorded treatment
-          costs.
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('patientPortal.appointmentsPage.title')}</h2>
+        <p className="text-gray-600 text-sm mt-1">{t('patientPortal.appointmentsPage.intro')}</p>
         <Link
           href="/patient/dashboard"
           className="inline-block mt-3 text-sm font-medium text-blue-600 hover:text-blue-800"
         >
-          ← Home
+          {t('patientPortal.nav.backHome')}
         </Link>
       </div>
       {renderContent()}

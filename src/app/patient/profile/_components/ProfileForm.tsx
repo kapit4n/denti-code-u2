@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react';
 import type { PatientProfile } from '@/types';
 import { useUpdateMyProfileMutation } from '@/features/patients/patientsApiSlice';
+import { useTranslation } from '@/i18n/I18nContext';
 
 interface ProfileFormProps {
   profile: PatientProfile;
@@ -11,6 +12,7 @@ interface ProfileFormProps {
 }
 
 export default function ProfileForm({ profile, onSaveSuccess, onCancel }: ProfileFormProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<Partial<PatientProfile>>(profile);
   const [updateProfile, { isLoading, error }] = useUpdateMyProfileMutation();
 
@@ -31,13 +33,13 @@ export default function ProfileForm({ profile, onSaveSuccess, onCancel }: Profil
 
   return (
     <form onSubmit={handleSubmit}>
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Edit your details</h3>
-      <p className="text-sm text-gray-500 mb-4">
-        Update what the front desk and clinical team should use to reach you and document your care.
-      </p>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('patientPortal.profileForm.title')}</h3>
+      <p className="text-sm text-gray-500 mb-4">{t('patientPortal.profileForm.intro')}</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">First name</label>
+          <label className="block text-sm font-medium text-gray-700">
+            {t('patientPortal.profileForm.firstName')}
+          </label>
           <input
             type="text"
             name="FirstName"
@@ -47,7 +49,9 @@ export default function ProfileForm({ profile, onSaveSuccess, onCancel }: Profil
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Last name</label>
+          <label className="block text-sm font-medium text-gray-700">
+            {t('patientPortal.profileForm.lastName')}
+          </label>
           <input
             type="text"
             name="LastName"
@@ -57,7 +61,9 @@ export default function ProfileForm({ profile, onSaveSuccess, onCancel }: Profil
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Contact phone</label>
+          <label className="block text-sm font-medium text-gray-700">
+            {t('patientPortal.profileForm.contactPhone')}
+          </label>
           <input
             type="tel"
             name="ContactPhone"
@@ -67,7 +73,9 @@ export default function ProfileForm({ profile, onSaveSuccess, onCancel }: Profil
           />
         </div>
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700">Address</label>
+          <label className="block text-sm font-medium text-gray-700">
+            {t('patientPortal.profileForm.address')}
+          </label>
           <input
             type="text"
             name="Address"
@@ -78,20 +86,20 @@ export default function ProfileForm({ profile, onSaveSuccess, onCancel }: Profil
         </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700">
-            Health notes for your care team
+            {t('patientPortal.profileForm.healthNotes')}
           </label>
           <textarea
             name="MedicalHistorySummary"
             value={formData.MedicalHistorySummary || ''}
             onChange={handleChange}
             rows={4}
-            placeholder="Allergies, medications, conditions…"
+            placeholder={t('patientPortal.profileForm.healthPlaceholder')}
             className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
       </div>
       {error && (
-        <p className="text-red-600 text-sm mt-4">Failed to save. Please try again.</p>
+        <p className="text-red-600 text-sm mt-4">{t('patientPortal.profileForm.saveError')}</p>
       )}
       <div className="mt-6 flex justify-end gap-3">
         <button
@@ -99,14 +107,14 @@ export default function ProfileForm({ profile, onSaveSuccess, onCancel }: Profil
           onClick={onCancel}
           className="py-2 px-4 rounded-lg border border-gray-300 text-gray-800 font-medium hover:bg-gray-50"
         >
-          Cancel
+          {t('patientPortal.profileForm.cancel')}
         </button>
         <button
           type="submit"
           disabled={isLoading}
           className="py-2 px-4 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-50"
         >
-          {isLoading ? 'Saving…' : 'Save'}
+          {isLoading ? t('patientPortal.profileForm.saving') : t('patientPortal.profileForm.save')}
         </button>
       </div>
     </form>

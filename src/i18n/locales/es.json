@@ -292,5 +292,103 @@
       "userId": "ID de usuario",
       "roles": "Roles"
     }
+  },
+  "patientPortal": {
+    "nav": {
+      "backHome": "← Inicio"
+    },
+    "emptyDash": "—",
+    "notProvided": "No indicado",
+    "primaryDentistFallback": "Dentista principal (ID clínica {id})",
+    "field": {
+      "name": "Nombre",
+      "email": "Correo",
+      "phone": "Teléfono",
+      "dob": "Fecha de nacimiento",
+      "address": "Dirección"
+    },
+    "dashboard": {
+      "title": "Inicio",
+      "intro": "Lo esencial para tu atención: tus datos en archivo, quién te verá después y lo facturado hasta ahora en la visita.",
+      "loading": "Cargando tu resumen…",
+      "profileError": "No pudimos cargar tu perfil.",
+      "upcomingTitle": "Próximas visitas",
+      "allVisits": "Todas las visitas →",
+      "apptLoadError": "No se pudieron cargar las citas.",
+      "noUpcoming": "No hay visitas próximas. Cuando la clínica te programe, aparecerán aquí con tu dentista y los costos registrados tras el tratamiento.",
+      "subtotalNote": "Los subtotales anteriores corresponden a tratamientos ya registrados en esas visitas. El cobro final puede venir de recepción.",
+      "quickLinks": "Accesos rápidos",
+      "linkFullList": "Lista completa de visitas e historial",
+      "linkProfile": "Actualizar contacto y notas de salud"
+    },
+    "infoSummary": {
+      "title": "Tu información",
+      "editDetails": "Editar datos"
+    },
+    "appointmentsPage": {
+      "title": "Tus visitas",
+      "intro": "Consulta con quién tienes cita, gestiona visitas próximas y revisa los costos de tratamiento registrados.",
+      "loadError": "No se pudieron cargar las citas. Inténtalo más tarde.",
+      "empty": "Aún no tienes visitas en archivo.",
+      "backHome": "Volver al inicio"
+    },
+    "list": {
+      "upcoming": "Próximas",
+      "upcomingHelp": "Tu dentista, el estado de la visita y totales de tratamiento ya registrados para esa cita.",
+      "noUpcoming": "No hay citas próximas.",
+      "past": "Visitas pasadas",
+      "pastHelp": "Visitas completadas o con fecha pasada e importes registrados cuando existan.",
+      "noPast": "Aún no hay visitas pasadas."
+    },
+    "card": {
+      "visitFallback": "Cita",
+      "dentist": "Dentista:",
+      "recordedTreatments": "Tratamientos registrados:",
+      "noCostPast": "No hay tratamientos registrados para esta visita.",
+      "noCostUpcoming": "Los costos aparecen después de la visita cuando la clínica registra los tratamientos.",
+      "helpFull": "Aceptar confirma tu asistencia. Reprogramar elige un nuevo horario (puede requerir confirmación de la clínica). Cancelar marca la visita como cancelada.",
+      "helpCompact": "Acepta, reprograma o cancela esta visita.",
+      "accept": "Aceptar",
+      "reschedule": "Reprogramar",
+      "cancel": "Cancelar",
+      "cancelConfirm": "¿Cancelar esta cita? La clínica la verá como cancelada.",
+      "errGeneric": "Algo salió mal. Inténtalo de nuevo.",
+      "errPickTime": "Elige una nueva fecha y hora.",
+      "errFuture": "Elige una fecha y hora futuras.",
+      "rescheduleTitle": "Reprogramar cita",
+      "rescheduleIntro": "Elige nueva fecha y hora. El estado volverá a \"Programada\" hasta que la clínica confirme.",
+      "newDateTime": "Nueva fecha y hora",
+      "close": "Cerrar",
+      "saveNewTime": "Guardar nuevo horario",
+      "ref": "#{id}"
+    },
+    "profilePage": {
+      "title": "Tus datos",
+      "introBefore": "Contacto y notas de salud que usa tu equipo de atención. Las citas y costos están en ",
+      "introBetween": " y ",
+      "introAfter": ".",
+      "loadError": "No se pudieron cargar tus datos. Inténtalo de nuevo."
+    },
+    "profileView": {
+      "sectionTitle": "Contacto y notas de salud",
+      "edit": "Editar",
+      "emailHint": "Se usa para iniciar sesión; cámbialo en la clínica si hace falta.",
+      "healthNotesTitle": "Notas de salud para tu equipo",
+      "healthNotesEmpty": "Nada en archivo — añade lo que tu dentista deba saber (alergias, condiciones, medicamentos)."
+    },
+    "profileForm": {
+      "title": "Editar tus datos",
+      "intro": "Actualiza cómo deben contactarte recepción y el equipo clínico y documentar tu atención.",
+      "firstName": "Nombre",
+      "lastName": "Apellidos",
+      "contactPhone": "Teléfono de contacto",
+      "address": "Dirección",
+      "healthNotes": "Notas de salud para tu equipo",
+      "healthPlaceholder": "Alergias, medicamentos, condiciones…",
+      "saveError": "No se pudo guardar. Inténtalo de nuevo.",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "saving": "Guardando…"
+    }
   }
 }

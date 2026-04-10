@@ -1,20 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useUpdateAppointmentMutation } from '@/features/appointments/appointmentsApiSlice';
-import {
-  appointmentStatusBadgeClass,
-  appointmentStatusLabel,
-} from '@/lib/appointments/appointmentStatus';
+import { appointmentStatusBadgeClass } from '@/lib/appointments/appointmentStatus';
+import { appointmentStatusT } from '@/lib/appointments/appointmentStatusI18n';
 import {
   patientCanAccept,
   patientCanCancel,
   patientCanReschedule,
 } from '@/lib/appointments/patientAppointmentActions';
 import { sumRecordedTreatmentTotal } from '@/lib/patient/appointmentCost';
+import { useTranslation } from '@/i18n/I18nContext';
 import type { Appointment } from '@/types';
-
-const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
 interface AppointmentCardProps {
   appointment: Appointment;
@@ -31,12 +28,12 @@ interface AppointmentCardProps {
   showCost?: boolean;
 }
 
-function formatError(err: unknown): string {
+function formatError(err: unknown, fallback: string): string {
   if (err && typeof err === 'object' && 'data' in err) {
     const data = (err as { data?: { message?: string } }).data;
     if (data?.message && typeof data.message === 'string') return data.message;
   }
-  return 'Something went wrong. Please try again.';
+  return fallback;
 }
 
 export default function AppointmentCard({
@@ -48,19 +45,25 @@ export default function AppointmentCard({
   compact = false,
   showCost = false,
 }: AppointmentCardProps) {
+  const { t, intlLocale } = useTranslation();
+  const money = useMemo(
+    () => new Intl.NumberFormat(intlLocale, { style: 'currency', currency: 'USD' }),
+    [intlLocale],
+  );
+
   const [updateAppointment, { isLoading }] = useUpdateAppointmentMutation();
   const [actionError, setActionError] = useState('');
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [rescheduleLocal, setRescheduleLocal] = useState('');
 
   const appointmentDate = new Date(appointment.ScheduledDateTime);
-  const formattedDate = appointmentDate.toLocaleDateString('en-US', {
+  const formattedDate = appointmentDate.toLocaleDateString(intlLocale, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
-  const formattedTime = appointmentDate.toLocaleTimeString('en-US', {
+  const formattedTime = appointmentDate.toLocaleTimeString(intlLocale, {
     hour: '2-digit',
     minute: '2-digit',
     hour12: true,
@@ -91,12 +94,12 @@ export default function AppointmentCard({
         body: { Status: 'Confirmed' },
       }).unwrap();
     } catch (e) {
-      setActionError(formatError(e));
+      setActionError(formatError(e, t('patientPortal.card.errGeneric')));
     }
   };
 
   const handleCancel = async () => {
-    if (!window.confirm('Cancel this appointment? The clinic will see it as cancelled.')) {
+    if (!window.confirm(t('patientPortal.card.cancelConfirm'))) {
       return;
     }
     setActionError('');
@@ -106,7 +109,7 @@ export default function AppointmentCard({
         body: { Status: 'Cancelled' },
       }).unwrap();
     } catch (e) {
-      setActionError(formatError(e));
+      setActionError(formatError(e, t('patientPortal.card.errGeneric')));
     }
   };
 
@@ -114,12 +117,12 @@ export default function AppointmentCard({
     e.preventDefault();
     setActionError('');
     if (!rescheduleLocal) {
-      setActionError('Choose a new date and time.');
+      setActionError(t('patientPortal.card.errPickTime'));
       return;
     }
     const next = new Date(rescheduleLocal);
     if (Number.isNaN(next.getTime()) || next.getTime() <= Date.now()) {
-      setActionError('Pick a future date and time.');
+      setActionError(t('patientPortal.card.errFuture'));
       return;
     }
     try {
@@ -132,7 +135,7 @@ export default function AppointmentCard({
       }).unwrap();
       setRescheduleOpen(false);
     } catch (err) {
-      setActionError(formatError(err));
+      setActionError(formatError(err, t('patientPortal.card.errGeneric')));
     }
   };
 
@@ -156,16 +159,16 @@ export default function AppointmentCard({
       <div className="flex justify-between items-start gap-4">
         <div className="min-w-0">
           <p className={titleClass}>
-            {appointment.AppointmentPurpose || 'Appointment'}
+            {appointment.AppointmentPurpose || t('patientPortal.card.visitFallback')}
           </p>
           <p className="text-sm text-gray-500 mt-1">
             <span className={appointmentStatusBadgeClass(appointment.Status)}>
-              {appointmentStatusLabel(appointment.Status)}
+              {appointmentStatusT(t, appointment.Status)}
             </span>
           </p>
           {doctorLabel ? (
             <p className="text-sm text-gray-700 mt-2">
-              <span className="text-gray-500">Dentist: </span>
+              <span className="text-gray-500">{t('patientPortal.card.dentist')} </span>
               {doctorLabel}
             </p>
           ) : null}
@@ -173,14 +176,14 @@ export default function AppointmentCard({
             <p className="text-sm text-gray-600 mt-1.5">
               {recordedTotal > 0 ? (
                 <>
-                  <span className="text-gray-500">Recorded treatments: </span>
+                  <span className="text-gray-500">{t('patientPortal.card.recordedTreatments')} </span>
                   <span className="font-semibold tabular-nums">{money.format(recordedTotal)}</span>
                 </>
               ) : (
                 <span className="text-gray-500">
                   {isPast
-                    ? 'No treatments recorded for this visit.'
-                    : 'Costs appear after your visit when the clinic posts treatments.'}
+                    ? t('patientPortal.card.noCostPast')
+                    : t('patientPortal.card.noCostUpcoming')}
                 </span>
               )}
             </p>
@@ -190,7 +193,9 @@ export default function AppointmentCard({
           <p className="text-md font-semibold text-gray-700">{formattedDate}</p>
           <p className="text-md text-gray-600">{formattedTime}</p>
           {!compact && (
-            <p className="text-xs text-gray-400 mt-1">#{appointment.AppointmentID}</p>
+            <p className="text-xs text-gray-400 mt-1">
+              {t('patientPortal.card.ref', { id: appointment.AppointmentID })}
+            </p>
           )}
         </div>
       </div>
@@ -200,13 +205,10 @@ export default function AppointmentCard({
           className={`border-t border-gray-200 space-y-3 ${compact ? 'mt-3 pt-3' : 'mt-4 pt-4'}`}
         >
           {!compact && (
-            <p className="text-xs text-gray-500">
-              Accept confirms your attendance. Reschedule picks a new time (may need clinic
-              confirmation). Cancel marks the visit as cancelled.
-            </p>
+            <p className="text-xs text-gray-500">{t('patientPortal.card.helpFull')}</p>
           )}
           {compact && (
-            <p className="text-xs text-gray-500">Accept, reschedule, or cancel this visit.</p>
+            <p className="text-xs text-gray-500">{t('patientPortal.card.helpCompact')}</p>
           )}
           <div className="flex flex-wrap gap-2">
             {showAccept && (
@@ -216,7 +218,7 @@ export default function AppointmentCard({
                 onClick={handleAccept}
                 className="bg-blue-600 text-white text-sm font-semibold py-2 px-3 rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >
-                Accept
+                {t('patientPortal.card.accept')}
               </button>
             )}
             {showReschedule && (
@@ -226,7 +228,7 @@ export default function AppointmentCard({
                 onClick={openReschedule}
                 className="bg-gray-100 text-gray-900 text-sm font-semibold py-2 px-3 rounded-lg border border-gray-200 hover:bg-gray-200 disabled:opacity-50"
               >
-                Reschedule
+                {t('patientPortal.card.reschedule')}
               </button>
             )}
             {showCancel && (
@@ -236,7 +238,7 @@ export default function AppointmentCard({
                 onClick={handleCancel}
                 className="bg-white text-red-700 text-sm font-semibold py-2 px-3 rounded-lg border border-red-200 hover:bg-red-50 disabled:opacity-50"
               >
-                Cancel
+                {t('patientPortal.card.cancel')}
               </button>
             )}
           </div>
@@ -247,15 +249,14 @@ export default function AppointmentCard({
       {rescheduleOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-            <h4 className="text-lg font-semibold text-gray-900">Reschedule appointment</h4>
-            <p className="text-sm text-gray-600 mt-1">
-              Choose a new date and time. Status will return to &quot;Scheduled&quot; until the
-              clinic confirms.
-            </p>
+            <h4 className="text-lg font-semibold text-gray-900">
+              {t('patientPortal.card.rescheduleTitle')}
+            </h4>
+            <p className="text-sm text-gray-600 mt-1">{t('patientPortal.card.rescheduleIntro')}</p>
             <form onSubmit={handleRescheduleSubmit} className="mt-4 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="rs">
-                  New date &amp; time
+                  {t('patientPortal.card.newDateTime')}
                 </label>
                 <input
                   id="rs"
@@ -277,14 +278,14 @@ export default function AppointmentCard({
                     setActionError('');
                   }}
                 >
-                  Close
+                  {t('patientPortal.card.close')}
                 </button>
                 <button
                   type="submit"
                   disabled={isLoading}
                   className="py-2 px-4 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {isLoading ? 'Saving…' : 'Save new time'}
+                  {isLoading ? t('common.saving') : t('patientPortal.card.saveNewTime')}
                 </button>
               </div>
             </form>
