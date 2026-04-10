@@ -11,17 +11,7 @@ import {
   getPeriodRange,
   shiftAnchor,
 } from '@/lib/doctor/doctorDashboardStats';
-
-const money = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-});
-
-const periodTabs: { id: DashboardPeriod; label: string }[] = [
-  { id: 'day', label: 'Daily' },
-  { id: 'month', label: 'Monthly' },
-  { id: 'year', label: 'Yearly' },
-];
+import { useTranslation } from '@/i18n/I18nContext';
 
 function StatCard({
   title,
@@ -51,9 +41,28 @@ function StatCard({
 }
 
 export default function DoctorDashboardStats() {
+  const { t, intlLocale } = useTranslation();
   const user = useAppSelector(selectCurrentUser);
   const [period, setPeriod] = useState<DashboardPeriod>('month');
   const [anchor, setAnchor] = useState(() => new Date());
+
+  const money = useMemo(
+    () =>
+      new Intl.NumberFormat(intlLocale, {
+        style: 'currency',
+        currency: 'USD',
+      }),
+    [intlLocale],
+  );
+
+  const periodTabs: { id: DashboardPeriod; label: string }[] = useMemo(
+    () => [
+      { id: 'day', label: t('doctor.stats.periodDaily') },
+      { id: 'month', label: t('doctor.stats.periodMonthly') },
+      { id: 'year', label: t('doctor.stats.periodYearly') },
+    ],
+    [t],
+  );
 
   const { data: doctors = [], isLoading: doctorsLoading } = useGetDoctorsQuery();
   const { data: appointments = [], isLoading: apptsLoading, isError } =
@@ -69,7 +78,10 @@ export default function DoctorDashboardStats() {
     return appointments.filter((a) => a.PrimaryDoctorID === clinicDoctor.DoctorID);
   }, [appointments, clinicDoctor]);
 
-  const range = useMemo(() => getPeriodRange(period, anchor), [period, anchor]);
+  const range = useMemo(
+    () => getPeriodRange(period, anchor, intlLocale),
+    [period, anchor, intlLocale],
+  );
 
   const stats = useMemo(
     () => aggregateDoctorDashboard(myAppointments, range),
@@ -83,17 +95,17 @@ export default function DoctorDashboardStats() {
   const goToday = () => setAnchor(new Date());
 
   if (loading) {
-    return <p className="text-gray-500">Loading dashboard…</p>;
+    return <p className="text-gray-500">{t('doctor.stats.loadingDashboard')}</p>;
   }
 
   if (isError) {
-    return <p className="text-red-600">Could not load appointments.</p>;
+    return <p className="text-red-600">{t('doctor.stats.loadApptError')}</p>;
   }
 
   if (!clinicDoctor) {
     return (
       <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-        Metrics appear when your account is linked to a clinic doctor record.
+        {t('doctor.stats.metricsNoDoctor')}
       </p>
     );
   }
@@ -125,7 +137,7 @@ export default function DoctorDashboardStats() {
             type="button"
             onClick={goPrev}
             className="px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-sm font-medium"
-            aria-label="Previous period"
+            aria-label={t('doctor.stats.prevPeriod')}
           >
             ←
           </button>
@@ -136,7 +148,7 @@ export default function DoctorDashboardStats() {
             type="button"
             onClick={goNext}
             className="px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-sm font-medium"
-            aria-label="Next period"
+            aria-label={t('doctor.stats.nextPeriod')}
           >
             →
           </button>
@@ -145,49 +157,52 @@ export default function DoctorDashboardStats() {
             onClick={goToday}
             className="px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 text-xs font-medium"
           >
-            This {period === 'day' ? 'day' : period === 'month' ? 'month' : 'year'}
+            {period === 'day'
+              ? t('doctor.stats.thisDay')
+              : period === 'month'
+                ? t('doctor.stats.thisMonth')
+                : t('doctor.stats.thisYear')}
           </button>
         </div>
       </div>
 
       <p className="text-xs text-gray-500">
-        <strong>Completed</strong> drives revenue and patients attended. <strong>Pending</strong>{' '}
-        includes scheduled, confirmed, in progress, and rescheduled visits in range (not completed,
-        cancelled, or no-show).
+        <strong>{t('doctor.stats.boldCompleted')}</strong> {t('doctor.stats.legendPart1')}{' '}
+        <strong>{t('doctor.stats.boldPending')}</strong> {t('doctor.stats.legendPart2')}
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard
-          title="Completed appointments"
+          title={t('doctor.stats.statCompleted')}
           value={stats.completedCount}
-          subtitle="Visits marked completed in range"
+          subtitle={t('doctor.stats.statCompletedSub')}
           accent="blue"
         />
         <StatCard
-          title="Pending appointments"
+          title={t('doctor.stats.statPending')}
           value={stats.pendingCount}
-          subtitle="Active pipeline in range"
+          subtitle={t('doctor.stats.statPendingSub')}
           accent="amber"
         />
         <StatCard
-          title="Patients attended"
+          title={t('doctor.stats.statPatients')}
           value={stats.patientsAttended}
-          subtitle="Unique patients (completed visits)"
+          subtitle={t('doctor.stats.statPatientsSub')}
           accent="emerald"
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <StatCard
-          title="Total revenue"
+          title={t('doctor.stats.statRevenue')}
           value={money.format(stats.totalRevenue)}
-          subtitle="From recorded treatments on completed visits"
+          subtitle={t('doctor.stats.statRevenueSub')}
           accent="violet"
         />
         <StatCard
-          title="Visits in period"
+          title={t('doctor.stats.statInPeriod')}
           value={stats.appointmentsInRange}
-          subtitle="All statuses in selected range"
+          subtitle={t('doctor.stats.statInPeriodSub')}
           accent="slate"
         />
       </div>

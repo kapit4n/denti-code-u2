@@ -14,18 +14,21 @@ import {
 import { useGetDoctorsQuery } from '@/features/doctors/doctorsApiSlice';
 import { useGetProcedureTypesQuery } from '@/features/procedures/proceduresApiSlice';
 import { useGetPatientsQuery } from '@/features/patients/patientsApiSlice';
-import {
-  APPOINTMENT_STATUSES,
-  appointmentStatusLabel,
-} from '@/lib/appointments/appointmentStatus';
+import { APPOINTMENT_STATUSES } from '@/lib/appointments/appointmentStatus';
+import { appointmentStatusT } from '@/lib/appointments/appointmentStatusI18n';
+import { useTranslation } from '@/i18n/I18nContext';
 import type { AppointmentStatus, PatientProfile, PerformedAction } from '@/types';
 
-const money = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-});
-
 export default function DoctorAppointmentDetailPage() {
+  const { t, intlLocale } = useTranslation();
+  const money = useMemo(
+    () =>
+      new Intl.NumberFormat(intlLocale, {
+        style: 'currency',
+        currency: 'USD',
+      }),
+    [intlLocale],
+  );
   const params = useParams();
   const rawId = params?.appointmentId;
   const appointmentId =
@@ -108,13 +111,13 @@ export default function DoctorAppointmentDetailPage() {
 
     const procId = Number.parseInt(procedureTypeId, 10);
     if (!Number.isFinite(procId)) {
-      setFormError('Select a procedure type.');
+      setFormError(t('doctor.detail.errProcedure'));
       return;
     }
     const qty = Math.max(1, Number.parseInt(quantity, 10) || 1);
     const price = Number.parseFloat(unitPrice);
     if (!Number.isFinite(price) || price < 0) {
-      setFormError('Enter a valid unit price.');
+      setFormError(t('doctor.detail.errPrice'));
       return;
     }
 
@@ -136,7 +139,7 @@ export default function DoctorAppointmentDetailPage() {
       setNotes('');
       setTooth('');
     } catch {
-      setFormError('Could not save treatment. Try again.');
+      setFormError(t('doctor.detail.errSaveTreatment'));
     }
   };
 
@@ -150,13 +153,13 @@ export default function DoctorAppointmentDetailPage() {
         body: { Status: statusDraft },
       }).unwrap();
     } catch {
-      setStatusError('Could not update status.');
+      setStatusError(t('doctor.detail.statusErr'));
     }
   };
 
   const handleRemove = async (action: PerformedAction) => {
     if (!appointment) return;
-    if (!window.confirm('Remove this treatment line from the appointment?')) return;
+    if (!window.confirm(t('doctor.detail.confirmRemove'))) return;
     try {
       await removeAction({
         actionId: action.PerformedActionID,
@@ -171,9 +174,9 @@ export default function DoctorAppointmentDetailPage() {
     return (
       <div className="space-y-4">
         <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
-          ← Visits
+          {t('doctor.nav.backVisits')}
         </Link>
-        <p className="text-red-600">Invalid appointment.</p>
+        <p className="text-red-600">{t('doctor.detail.invalidAppt')}</p>
       </div>
     );
   }
@@ -182,9 +185,9 @@ export default function DoctorAppointmentDetailPage() {
     return (
       <div>
         <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
-          ← Visits
+          {t('doctor.nav.backVisits')}
         </Link>
-        <p className="mt-4 text-gray-500">Loading appointment…</p>
+        <p className="mt-4 text-gray-500">{t('doctor.detail.loadingAppt')}</p>
       </div>
     );
   }
@@ -193,10 +196,10 @@ export default function DoctorAppointmentDetailPage() {
     return (
       <div>
         <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
-          ← Visits
+          {t('doctor.nav.backVisits')}
         </Link>
         <p className="mt-4 text-red-600">
-          Could not load appointment.
+          {t('doctor.detail.loadApptError')}
           {error && 'data' in error && (error.data as { message?: string })?.message
             ? ` ${(error.data as { message?: string }).message}`
             : ''}
@@ -209,9 +212,9 @@ export default function DoctorAppointmentDetailPage() {
     return (
       <div>
         <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
-          ← Visits
+          {t('doctor.nav.backVisits')}
         </Link>
-        <p className="mt-4 text-amber-800">No clinic doctor profile for your account.</p>
+        <p className="mt-4 text-amber-800">{t('doctor.detail.noClinicDoctor')}</p>
       </div>
     );
   }
@@ -220,11 +223,9 @@ export default function DoctorAppointmentDetailPage() {
     return (
       <div>
         <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
-          ← Visits
+          {t('doctor.nav.backVisits')}
         </Link>
-        <p className="mt-4 text-amber-800">
-          You can only record treatments for appointments where you are the primary doctor.
-        </p>
+        <p className="mt-4 text-amber-800">{t('doctor.detail.wrongPrimary')}</p>
       </div>
     );
   }
@@ -235,17 +236,19 @@ export default function DoctorAppointmentDetailPage() {
     <div className="space-y-8">
       <div>
         <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
-          ← Visits
+          {t('doctor.nav.backVisits')}
         </Link>
-        <h2 className="text-2xl font-bold text-gray-900 mt-2">Visit</h2>
-        <p className="text-gray-500 text-xs mt-1">Ref #{appointment.AppointmentID}</p>
+        <h2 className="text-2xl font-bold text-gray-900 mt-2">{t('doctor.detail.visitTitle')}</h2>
+        <p className="text-gray-500 text-xs mt-1">
+          {t('doctor.detail.ref', { id: appointment.AppointmentID })}
+        </p>
       </div>
 
       <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <h3 className="text-base font-semibold text-gray-900 mb-4">Summary</h3>
+        <h3 className="text-base font-semibold text-gray-900 mb-4">{t('doctor.detail.summary')}</h3>
         <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <div>
-            <dt className="text-gray-500">Patient</dt>
+            <dt className="text-gray-500">{t('doctor.detail.patient')}</dt>
             <dd className="font-medium text-gray-900 mt-0.5">
               {patient ? (
                 <Link
@@ -255,31 +258,31 @@ export default function DoctorAppointmentDetailPage() {
                   {patient.FirstName} {patient.LastName}
                 </Link>
               ) : (
-                `Patient ID ${appointment.PatientID}`
+                t('doctor.detail.patientId', { id: appointment.PatientID })
               )}
             </dd>
           </div>
           <div>
-            <dt className="text-gray-500">Scheduled</dt>
+            <dt className="text-gray-500">{t('doctor.detail.scheduled')}</dt>
             <dd className="font-medium text-gray-900">
-              {when.toLocaleString('en-US', {
+              {when.toLocaleString(intlLocale, {
                 dateStyle: 'medium',
                 timeStyle: 'short',
               })}
             </dd>
           </div>
           <div className="sm:col-span-2">
-            <dt className="text-gray-500 mb-2">Status</dt>
+            <dt className="text-gray-500 mb-2">{t('doctor.detail.status')}</dt>
             <dd className="flex flex-wrap items-center gap-3">
               <select
                 className="border rounded-lg px-3 py-2 text-sm text-gray-900 min-w-[200px]"
                 value={statusDraft}
                 onChange={(e) => setStatusDraft(e.target.value as AppointmentStatus)}
-                aria-label="Appointment status"
+                aria-label={t('doctor.detail.statusAria')}
               >
                 {APPOINTMENT_STATUSES.map((s) => (
                   <option key={s} value={s}>
-                    {appointmentStatusLabel(s)}
+                    {appointmentStatusT(t, s)}
                   </option>
                 ))}
               </select>
@@ -289,24 +292,21 @@ export default function DoctorAppointmentDetailPage() {
                 disabled={savingStatus || statusDraft === appointment.Status}
                 className="text-sm font-medium py-2 px-3 rounded-lg bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-40"
               >
-                {savingStatus ? 'Saving…' : 'Save status'}
+                {savingStatus ? t('doctor.detail.saving') : t('doctor.detail.saveStatus')}
               </button>
             </dd>
             {statusError ? <p className="text-sm text-red-600 mt-2">{statusError}</p> : null}
-            <p className="text-xs text-gray-500 mt-2">
-              Flow: scheduled → confirmed → in progress → completed; cancel or no-show if the visit
-              does not finish as planned.
-            </p>
+            <p className="text-xs text-gray-500 mt-2">{t('doctor.detail.statusFlowHint')}</p>
           </div>
           <div>
-            <dt className="text-gray-500">Purpose</dt>
+            <dt className="text-gray-500">{t('doctor.detail.purpose')}</dt>
             <dd className="font-medium text-gray-900">
               {appointment.AppointmentPurpose || '—'}
             </dd>
           </div>
           {appointment.Notes ? (
             <div className="sm:col-span-2">
-              <dt className="text-gray-500">Appointment notes</dt>
+              <dt className="text-gray-500">{t('doctor.detail.apptNotes')}</dt>
               <dd className="text-gray-800">{appointment.Notes}</dd>
             </div>
           ) : null}
@@ -315,23 +315,25 @@ export default function DoctorAppointmentDetailPage() {
 
       <section className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-gray-100 flex flex-wrap justify-between items-center gap-4">
-          <h3 className="text-base font-semibold text-gray-900">Treatments recorded</h3>
+          <h3 className="text-base font-semibold text-gray-900">
+            {t('doctor.detail.treatmentsTitle')}
+          </h3>
           <p className="text-lg font-bold text-gray-900">
-            Total: {money.format(totalCost)}
+            {t('doctor.detail.total', { amount: money.format(totalCost) })}
           </p>
         </div>
         {actions.length === 0 ? (
-          <p className="p-6 text-gray-500 text-sm">No treatments recorded yet.</p>
+          <p className="p-6 text-gray-500 text-sm">{t('doctor.detail.noTreatments')}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
               <thead className="bg-gray-50 text-gray-600 border-b border-gray-200">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Procedure</th>
-                  <th className="px-4 py-3 font-medium">Notes</th>
-                  <th className="px-4 py-3 font-medium text-right">Qty</th>
-                  <th className="px-4 py-3 font-medium text-right">Unit</th>
-                  <th className="px-4 py-3 font-medium text-right">Line total</th>
+                  <th className="px-4 py-3 font-medium">{t('doctor.detail.thProcedure')}</th>
+                  <th className="px-4 py-3 font-medium">{t('doctor.detail.thNotes')}</th>
+                  <th className="px-4 py-3 font-medium text-right">{t('doctor.detail.thQty')}</th>
+                  <th className="px-4 py-3 font-medium text-right">{t('doctor.detail.thUnit')}</th>
+                  <th className="px-4 py-3 font-medium text-right">{t('doctor.detail.thLineTotal')}</th>
                   <th className="px-4 py-3 w-24" />
                 </tr>
               </thead>
@@ -342,10 +344,13 @@ export default function DoctorAppointmentDetailPage() {
                     <tr key={a.PerformedActionID} className="border-b border-gray-100">
                       <td className="px-4 py-3">
                         <div className="font-medium text-gray-900">
-                          {proc?.ProcedureName ?? `Procedure #${a.ProcedureTypeID}`}
+                          {proc?.ProcedureName ??
+                            t('doctor.detail.procedureNum', { id: a.ProcedureTypeID })}
                         </div>
                         {a.ToothInvolved ? (
-                          <div className="text-xs text-gray-500">Tooth: {a.ToothInvolved}</div>
+                          <div className="text-xs text-gray-500">
+                            {t('doctor.detail.toothLabel', { tooth: a.ToothInvolved })}
+                          </div>
                         ) : null}
                       </td>
                       <td className="px-4 py-3 text-gray-600 max-w-xs truncate">
@@ -365,7 +370,7 @@ export default function DoctorAppointmentDetailPage() {
                           disabled={isRemoving}
                           className="text-red-600 hover:text-red-800 text-xs font-medium"
                         >
-                          Remove
+                          {t('doctor.detail.remove')}
                         </button>
                       </td>
                     </tr>
@@ -378,11 +383,13 @@ export default function DoctorAppointmentDetailPage() {
       </section>
 
       <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <h3 className="text-base font-semibold text-gray-900 mb-4">Add treatment line</h3>
+        <h3 className="text-base font-semibold text-gray-900 mb-4">
+          {t('doctor.detail.addTreatmentTitle')}
+        </h3>
         <form onSubmit={handleAddTreatment} className="space-y-4 max-w-xl">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="proc">
-              Procedure
+              {t('doctor.detail.procedure')}
             </label>
             <select
               id="proc"
@@ -391,7 +398,7 @@ export default function DoctorAppointmentDetailPage() {
               onChange={(e) => onProcedureChange(e.target.value)}
               required
             >
-              <option value="">Select procedure…</option>
+              <option value="">{t('doctor.detail.selectProcedure')}</option>
               {procedures
                 .filter((p) => p.IsActive !== false)
                 .map((p) => (
@@ -405,7 +412,7 @@ export default function DoctorAppointmentDetailPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="qty">
-                Quantity
+                {t('doctor.detail.quantity')}
               </label>
               <input
                 id="qty"
@@ -418,7 +425,7 @@ export default function DoctorAppointmentDetailPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="price">
-                Unit price
+                {t('doctor.detail.unitPrice')}
               </label>
               <input
                 id="price"
@@ -434,7 +441,7 @@ export default function DoctorAppointmentDetailPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="tooth">
-              Tooth / site (optional)
+              {t('doctor.detail.toothOptional')}
             </label>
             <input
               id="tooth"
@@ -442,12 +449,12 @@ export default function DoctorAppointmentDetailPage() {
               className="w-full border rounded-lg px-3 py-2 text-gray-900"
               value={tooth}
               onChange={(e) => setTooth(e.target.value)}
-              placeholder="e.g. 14, UL quadrant"
+              placeholder={t('doctor.detail.toothPlaceholder')}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="tnotes">
-              Clinical notes (optional)
+              {t('doctor.detail.clinicalNotes')}
             </label>
             <textarea
               id="tnotes"
@@ -463,7 +470,7 @@ export default function DoctorAppointmentDetailPage() {
             disabled={adding || procedures.length === 0}
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg disabled:opacity-50"
           >
-            {adding ? 'Saving…' : 'Add treatment'}
+            {adding ? t('doctor.detail.saving') : t('doctor.detail.addTreatment')}
           </button>
         </form>
       </section>

@@ -7,9 +7,18 @@ import {
   monthCalendarGrid,
   startOfMonth,
 } from '@/lib/doctor/calendarUtils';
+import { useTranslation } from '@/i18n/I18nContext';
 import type { Appointment, PatientProfile } from '@/types';
 
-const WEEKDAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
+const WEEKDAY_KEYS = [
+  'weekMon',
+  'weekTue',
+  'weekWed',
+  'weekThu',
+  'weekFri',
+  'weekSat',
+  'weekSun',
+] as const;
 const MAX_VISIBLE = 4;
 
 type Props = {
@@ -33,6 +42,7 @@ export default function DoctorMonthView({
   appointments,
   patientById,
 }: Props) {
+  const { t, intlLocale } = useTranslation();
   const monthStart = startOfMonth(monthAnchor);
   const monthIndex = monthStart.getMonth();
   const gridDays = monthCalendarGrid(monthAnchor);
@@ -42,12 +52,12 @@ export default function DoctorMonthView({
   return (
     <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
       <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
-        {WEEKDAY_LABELS.map((w) => (
+        {WEEKDAY_KEYS.map((k) => (
           <div
-            key={w}
+            key={k}
             className="py-2 text-center text-xs font-semibold text-gray-600 uppercase tracking-wide"
           >
-            {w}
+            {t(`doctor.calendar.${k}`)}
           </div>
         ))}
       </div>
@@ -76,7 +86,7 @@ export default function DoctorMonthView({
               <div className="flex-1 space-y-0.5 overflow-y-auto min-h-0 max-h-[140px] sm:max-h-[180px]">
                 {visible.map((a) => {
                   const when = new Date(a.ScheduledDateTime);
-                  const time = when.toLocaleTimeString('en-US', {
+                  const time = when.toLocaleTimeString(intlLocale, {
                     hour: 'numeric',
                     minute: '2-digit',
                   });
@@ -98,7 +108,9 @@ export default function DoctorMonthView({
                   );
                 })}
                 {more > 0 && inMonth && (
-                  <p className="text-[10px] text-gray-500 pl-0.5">+{more} more</p>
+                  <p className="text-[10px] text-gray-500 pl-0.5">
+                    {t('doctor.calendar.moreCount', { count: more })}
+                  </p>
                 )}
               </div>
             </div>

@@ -8,6 +8,7 @@ import { useGetAppointmentsQuery } from '@/features/appointments/appointmentsApi
 import { useGetDoctorsQuery } from '@/features/doctors/doctorsApiSlice';
 import { useGetPatientsQuery } from '@/features/patients/patientsApiSlice';
 import type { PatientProfile } from '@/types';
+import { useTranslation } from '@/i18n/I18nContext';
 
 type TreatedPatient = {
   patientId: number;
@@ -17,6 +18,7 @@ type TreatedPatient = {
 };
 
 export default function DoctorPatientsPage() {
+  const { t, intlLocale } = useTranslation();
   const user = useAppSelector(selectCurrentUser);
   const { data: doctors = [], isLoading: doctorsLoading } = useGetDoctorsQuery();
   const { data: appointments = [], isLoading: apptsLoading } = useGetAppointmentsQuery();
@@ -67,8 +69,8 @@ export default function DoctorPatientsPage() {
   if (loading) {
     return (
       <div className="max-w-4xl">
-        <h2 className="text-2xl font-bold text-gray-900">Patients</h2>
-        <p className="text-gray-500 text-sm mt-4">Loading…</p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('doctor.patients.title')}</h2>
+        <p className="text-gray-500 text-sm mt-4">{t('common.loading')}</p>
       </div>
     );
   }
@@ -76,12 +78,12 @@ export default function DoctorPatientsPage() {
   if (!clinicDoctor) {
     return (
       <div className="max-w-4xl space-y-4">
-        <h2 className="text-2xl font-bold text-gray-900">Patients</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t('doctor.patients.title')}</h2>
         <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-          Link your login to a clinic doctor record to see patients you treat.
+          {t('doctor.patients.linkDoctorHint')}
         </p>
         <Link href="/doctor/dashboard" className="text-sm font-medium text-blue-600 hover:underline">
-          ← Home
+          {t('doctor.nav.backHome')}
         </Link>
       </div>
     );
@@ -90,35 +92,33 @@ export default function DoctorPatientsPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Patients you treat</h2>
-        <p className="text-gray-600 text-sm mt-1">
-          Everyone with at least one visit where you are the primary dentist.
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('doctor.patients.listTitle')}</h2>
+        <p className="text-gray-600 text-sm mt-1">{t('doctor.patients.listIntro')}</p>
         <Link
           href="/doctor/dashboard"
           className="inline-block mt-2 text-sm font-medium text-blue-600 hover:text-blue-800"
         >
-          ← Home
+          {t('doctor.nav.backHome')}
         </Link>
       </div>
 
       {treatedPatients.length === 0 ? (
         <div className="bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-500 text-sm">
-          No patients yet. Book a visit from{' '}
+          {t('doctor.patients.emptyBefore')}
           <Link href="/doctor/appointments" className="text-blue-600 font-medium hover:underline">
-            Visits
+            {t('nav.visits')}
           </Link>
-          .
+          {t('doctor.patients.emptyAfter')}
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <table className="w-full text-sm text-left">
             <thead className="bg-gray-50 text-gray-600 border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3 font-medium">Patient</th>
-                <th className="px-4 py-3 font-medium">Phone</th>
-                <th className="px-4 py-3 font-medium text-right">Visits with you</th>
-                <th className="px-4 py-3 font-medium">Last seen</th>
+                <th className="px-4 py-3 font-medium">{t('doctor.patients.colPatient')}</th>
+                <th className="px-4 py-3 font-medium">{t('doctor.patients.colPhone')}</th>
+                <th className="px-4 py-3 font-medium text-right">{t('doctor.patients.colVisits')}</th>
+                <th className="px-4 py-3 font-medium">{t('doctor.patients.colLastSeen')}</th>
                 <th className="px-4 py-3 w-28" />
               </tr>
             </thead>
@@ -129,7 +129,7 @@ export default function DoctorPatientsPage() {
                     <span className="font-medium text-gray-900">
                       {row.profile
                         ? `${row.profile.FirstName} ${row.profile.LastName}`
-                        : 'Unknown name'}
+                        : t('doctor.patients.unknownName')}
                     </span>
                     {row.profile?.Email ? (
                       <div className="text-xs text-gray-500 truncate max-w-[200px]">
@@ -145,7 +145,7 @@ export default function DoctorPatientsPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-600">
                     {row.lastVisit
-                      ? row.lastVisit.toLocaleDateString('en-US', {
+                      ? row.lastVisit.toLocaleDateString(intlLocale, {
                           month: 'short',
                           day: 'numeric',
                           year: 'numeric',
@@ -157,7 +157,7 @@ export default function DoctorPatientsPage() {
                       href={`/doctor/patients/${row.patientId}`}
                       className="text-blue-600 hover:text-blue-800 font-medium text-sm"
                     >
-                      Open →
+                      {t('doctor.patients.open')}
                     </Link>
                   </td>
                 </tr>

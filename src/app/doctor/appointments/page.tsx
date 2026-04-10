@@ -8,10 +8,12 @@ import { useGetDoctorsQuery } from '@/features/doctors/doctorsApiSlice';
 import { useGetPatientsQuery } from '@/features/patients/patientsApiSlice';
 import Link from 'next/link';
 import type { PatientProfile } from '@/types';
+import { useTranslation } from '@/i18n/I18nContext';
 import DoctorAppointmentsList from './_components/DoctorAppointmentsList';
 import CreateAppointmentModal from './_components/CreateAppointmentModal';
 
 export default function DoctorAppointmentsPage() {
+  const { t } = useTranslation();
   const user = useAppSelector(selectCurrentUser);
   const [showCreate, setShowCreate] = useState(false);
 
@@ -50,8 +52,8 @@ export default function DoctorAppointmentsPage() {
   if (loading) {
     return (
       <div className="max-w-4xl">
-        <h2 className="text-2xl font-bold text-gray-900">Visits</h2>
-        <p className="text-gray-500 text-sm mt-4">Loading…</p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('doctor.appointments.title')}</h2>
+        <p className="text-gray-500 text-sm mt-4">{t('doctor.appointments.loading')}</p>
       </div>
     );
   }
@@ -59,8 +61,8 @@ export default function DoctorAppointmentsPage() {
   if (doctorsError || apptsError) {
     return (
       <div className="max-w-4xl">
-        <h2 className="text-2xl font-bold text-gray-900">Visits</h2>
-        <p className="text-red-600 text-sm mt-4">Could not load data. Try again.</p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('doctor.appointments.title')}</h2>
+        <p className="text-red-600 text-sm mt-4">{t('doctor.appointments.loadError')}</p>
       </div>
     );
   }
@@ -68,15 +70,13 @@ export default function DoctorAppointmentsPage() {
   if (!clinicDoctor) {
     return (
       <div className="max-w-4xl space-y-4">
-        <h2 className="text-2xl font-bold text-gray-900">Visits</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t('doctor.appointments.title')}</h2>
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-amber-900 text-sm">
-          <p className="font-medium">No clinic profile for this login</p>
-          <p className="mt-1 text-amber-800/90">
-            Use a doctor email registered in the clinic service (see README seed users).
-          </p>
+          <p className="font-medium">{t('doctor.appointments.noClinicTitle')}</p>
+          <p className="mt-1 text-amber-800/90">{t('doctor.appointments.noClinicBody')}</p>
         </div>
         <Link href="/doctor/dashboard" className="text-sm font-medium text-blue-600 hover:underline">
-          ← Home
+          {t('doctor.nav.backHome')}
         </Link>
       </div>
     );
@@ -86,19 +86,19 @@ export default function DoctorAppointmentsPage() {
     <div className="max-w-4xl space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Visits</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{t('doctor.appointments.title')}</h2>
           <p className="text-sm text-gray-600 mt-1">
-            {doctorAppointments.length} as your primary visits ·{' '}
-            <span className="text-gray-500">
-              Dr. {clinicDoctor.FirstName} {clinicDoctor.LastName}
-            </span>
+            {t('doctor.appointments.subtitle', {
+              count: doctorAppointments.length,
+              name: `${clinicDoctor.FirstName} ${clinicDoctor.LastName}`,
+            })}
           </p>
           <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm font-medium">
             <Link href="/doctor/dashboard" className="text-blue-600 hover:text-blue-800">
-              ← Home
+              {t('doctor.nav.backHome')}
             </Link>
             <Link href="/doctor/calendar" className="text-blue-600 hover:text-blue-800">
-              Week / day calendar →
+              {t('doctor.appointments.calendarLink')}
             </Link>
           </div>
         </div>
@@ -107,7 +107,7 @@ export default function DoctorAppointmentsPage() {
           onClick={() => setShowCreate(true)}
           className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 px-4 rounded-lg shrink-0"
         >
-          New visit
+          {t('doctor.appointments.newVisit')}
         </button>
       </div>
 

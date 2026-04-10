@@ -1,12 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import {
-  appointmentStatusBadgeClass,
-  appointmentStatusCalendarSurfaceClass,
-  appointmentStatusLabel,
-} from '@/lib/appointments/appointmentStatus';
+import { appointmentStatusBadgeClass, appointmentStatusCalendarSurfaceClass } from '@/lib/appointments/appointmentStatus';
+import { appointmentStatusT } from '@/lib/appointments/appointmentStatusI18n';
 import { isSameCalendarDay, weekDaysFrom } from '@/lib/doctor/calendarUtils';
+import { useTranslation } from '@/i18n/I18nContext';
 import type { Appointment, PatientProfile } from '@/types';
 
 type Props = {
@@ -29,6 +27,7 @@ export default function DoctorWeekView({
   appointments,
   patientById,
 }: Props) {
+  const { t, intlLocale } = useTranslation();
   const days = weekDaysFrom(weekStartMonday);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -38,7 +37,7 @@ export default function DoctorWeekView({
       {days.map((day) => {
         const dayAppts = appointmentsForDay(appointments, day);
         const isToday = isSameCalendarDay(day, today);
-        const header = day.toLocaleDateString('en-US', {
+        const header = day.toLocaleDateString(intlLocale, {
           weekday: 'short',
           month: 'short',
           day: 'numeric',
@@ -64,12 +63,14 @@ export default function DoctorWeekView({
               ) : (
                 dayAppts.map((a) => {
                   const when = new Date(a.ScheduledDateTime);
-                  const time = when.toLocaleTimeString('en-US', {
+                  const time = when.toLocaleTimeString(intlLocale, {
                     hour: 'numeric',
                     minute: '2-digit',
                   });
                   const p = patientById.get(a.PatientID);
-                  const name = p ? `${p.FirstName} ${p.LastName}` : `#${a.PatientID}`;
+                  const name = p
+                    ? `${p.FirstName} ${p.LastName}`
+                    : t('doctor.patientNum', { id: a.PatientID });
 
                   return (
                     <Link
@@ -82,12 +83,12 @@ export default function DoctorWeekView({
                         {name}
                       </p>
                       <p className="text-[10px] text-gray-500 truncate mt-0.5">
-                        {a.AppointmentPurpose || 'Visit'}
+                        {a.AppointmentPurpose || t('doctor.visitDefault')}
                       </p>
                       <span
                         className={`inline-block mt-1 text-[10px] ${appointmentStatusBadgeClass(a.Status)}`}
                       >
-                        {appointmentStatusLabel(a.Status)}
+                        {appointmentStatusT(t, a.Status)}
                       </span>
                     </Link>
                   );

@@ -7,20 +7,15 @@ import { selectCurrentUser } from '@/features/auth/authSlice';
 import { useGetAppointmentsQuery } from '@/features/appointments/appointmentsApiSlice';
 import { useGetDoctorsQuery } from '@/features/doctors/doctorsApiSlice';
 import { useGetPatientsQuery } from '@/features/patients/patientsApiSlice';
-import {
-  appointmentStatusBadgeClass,
-  appointmentStatusLabel,
-} from '@/lib/appointments/appointmentStatus';
+import { appointmentStatusBadgeClass } from '@/lib/appointments/appointmentStatus';
+import { appointmentStatusT } from '@/lib/appointments/appointmentStatusI18n';
+import { useTranslation } from '@/i18n/I18nContext';
 import type { Appointment, PatientProfile } from '@/types';
 
 const UPCOMING_PREVIEW = 6;
 
-function formatWhen(iso: string) {
-  const d = new Date(iso);
-  return d.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
-}
-
 export default function DoctorHomeOverview() {
+  const { t, intlLocale } = useTranslation();
   const user = useAppSelector(selectCurrentUser);
   const { data: doctors = [], isLoading: docLoading } = useGetDoctorsQuery();
   const { data: appointments = [], isLoading: apptLoading } = useGetAppointmentsQuery();
@@ -66,11 +61,8 @@ export default function DoctorHomeOverview() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Home</h2>
-        <p className="text-sm text-gray-600 mt-1 max-w-2xl">
-          Next on your calendar, quick navigation, and practice metrics below for the period you
-          select.
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('doctor.home.title')}</h2>
+        <p className="text-sm text-gray-600 mt-1 max-w-2xl">{t('doctor.home.intro')}</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -78,49 +70,54 @@ export default function DoctorHomeOverview() {
           href="/doctor/appointments"
           className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
         >
-          Visits &amp; new booking
+          {t('doctor.home.linkVisits')}
         </Link>
         <Link
           href="/doctor/calendar"
           className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
         >
-          Week / day calendar
+          {t('doctor.home.linkCalendar')}
         </Link>
         <Link
           href="/doctor/patients"
           className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
         >
-          Patients you treat
+          {t('doctor.home.linkPatients')}
         </Link>
       </div>
 
-      {loading && <p className="text-sm text-gray-500">Loading schedule…</p>}
+      {loading && <p className="text-sm text-gray-500">{t('doctor.home.loadingSchedule')}</p>}
 
       {!loading && !clinicDoctor && (
         <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-          Your login email must match a doctor in the clinic directory to see your schedule and
-          metrics. Use a seeded doctor account from the project README.
+          {t('doctor.home.noDoctorWarning')}
         </p>
       )}
 
       {!loading && clinicDoctor && (
         <section className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-100 flex flex-wrap justify-between items-center gap-2">
-            <h3 className="text-sm font-semibold text-gray-900">Next on your calendar</h3>
+            <h3 className="text-sm font-semibold text-gray-900">{t('doctor.home.nextCalendar')}</h3>
             <Link
               href="/doctor/appointments"
               className="text-xs font-medium text-blue-600 hover:text-blue-800"
             >
-              All visits →
+              {t('doctor.home.allVisits')}
             </Link>
           </div>
           {upcoming.length === 0 ? (
-            <p className="p-4 text-sm text-gray-500">No upcoming visits as primary doctor.</p>
+            <p className="p-4 text-sm text-gray-500">{t('doctor.home.noUpcoming')}</p>
           ) : (
             <ul className="divide-y divide-gray-100">
               {upcoming.map((a: Appointment) => {
                 const p = patientById.get(a.PatientID);
-                const label = p ? `${p.FirstName} ${p.LastName}` : `Patient #${a.PatientID}`;
+                const label = p
+                  ? `${p.FirstName} ${p.LastName}`
+                  : t('doctor.patientNum', { id: a.PatientID });
+                const whenStr = new Date(a.ScheduledDateTime).toLocaleString(intlLocale, {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+                });
                 return (
                   <li
                     key={a.AppointmentID}
@@ -129,21 +126,19 @@ export default function DoctorHomeOverview() {
                     <div className="min-w-0">
                       <p className="font-medium text-gray-900">{label}</p>
                       <p className="text-xs text-gray-500 truncate">
-                        {a.AppointmentPurpose || 'Visit'}
+                        {a.AppointmentPurpose || t('doctor.visitDefault')}
                       </p>
                       <span className={`mt-1 ${appointmentStatusBadgeClass(a.Status)}`}>
-                        {appointmentStatusLabel(a.Status)}
+                        {appointmentStatusT(t, a.Status)}
                       </span>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-sm font-medium text-gray-800">
-                        {formatWhen(a.ScheduledDateTime)}
-                      </p>
+                      <p className="text-sm font-medium text-gray-800">{whenStr}</p>
                       <Link
                         href={`/doctor/appointments/${a.AppointmentID}`}
                         className="text-xs font-medium text-blue-600 hover:text-blue-800 mt-1 inline-block"
                       >
-                        Open visit →
+                        {t('doctor.home.openVisit')}
                       </Link>
                     </div>
                   </li>

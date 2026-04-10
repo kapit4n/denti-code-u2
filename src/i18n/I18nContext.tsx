@@ -34,6 +34,8 @@ export type I18nContextValue = {
   setDisplayLanguage: (code: string | null) => Promise<void>;
   /** Effective selection for the menu: code or null when following org default. */
   userPreferredLocale: string | null | undefined;
+  /** BCP 47 tag for `Intl` / `toLocaleDateString` (e.g. en-US, es-ES). */
+  intlLocale: string;
 };
 
 const I18nContext = createContext<I18nContextValue | null>(null);
@@ -75,6 +77,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [user, guestLocale, orgDefault]);
 
   const messages = useMemo(() => pickMessages(effectiveLocale), [effectiveLocale]);
+
+  const intlLocale = effectiveLocale === 'es' ? 'es-ES' : 'en-US';
 
   const t = useCallback(
     (key: string, vars?: Record<string, string | number>) => translate(messages, key, vars),
@@ -125,6 +129,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       locale: effectiveLocale,
+      intlLocale,
       t,
       orgDefaultLocale: orgDefault,
       supportedLocales,
@@ -134,6 +139,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }),
     [
       effectiveLocale,
+      intlLocale,
       t,
       orgDefault,
       supportedLocales,

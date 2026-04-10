@@ -18,12 +18,13 @@ function endOfDay(d: Date): Date {
 export function getPeriodRange(
   period: DashboardPeriod,
   anchor: Date,
+  intlLocale = 'en-US',
 ): { start: Date; end: Date; label: string } {
   if (period === 'day') {
     return {
       start: startOfDay(anchor),
       end: endOfDay(anchor),
-      label: anchor.toLocaleDateString('en-US', {
+      label: anchor.toLocaleDateString(intlLocale, {
         weekday: 'long',
         month: 'long',
         day: 'numeric',
@@ -37,7 +38,7 @@ export function getPeriodRange(
     return {
       start,
       end,
-      label: anchor.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+      label: anchor.toLocaleDateString(intlLocale, { month: 'long', year: 'numeric' }),
     };
   }
   const start = new Date(anchor.getFullYear(), 0, 1);

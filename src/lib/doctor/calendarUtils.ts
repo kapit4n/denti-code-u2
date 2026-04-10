@@ -26,12 +26,16 @@ export function weekDaysFrom(startMonday: Date): Date[] {
   return Array.from({ length: 7 }, (_, i) => addDays(startMonday, i));
 }
 
-export function formatWeekRangeLabel(startMonday: Date, endSunday: Date): string {
+export function formatWeekRangeLabel(
+  startMonday: Date,
+  endSunday: Date,
+  intlLocale = 'en-US',
+): string {
   const opts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
   const yOpts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
   const sameYear = startMonday.getFullYear() === endSunday.getFullYear();
-  const startStr = startMonday.toLocaleDateString('en-US', sameYear ? opts : yOpts);
-  const endStr = endSunday.toLocaleDateString('en-US', yOpts);
+  const startStr = startMonday.toLocaleDateString(intlLocale, sameYear ? opts : yOpts);
+  const endStr = endSunday.toLocaleDateString(intlLocale, yOpts);
   return `${startStr} – ${endStr}`;
 }
 
@@ -47,8 +51,8 @@ export function addMonths(d: Date, n: number): Date {
   return x;
 }
 
-export function formatMonthYearLabel(d: Date): string {
-  return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+export function formatMonthYearLabel(d: Date, intlLocale = 'en-US'): string {
+  return d.toLocaleDateString(intlLocale, { month: 'long', year: 'numeric' });
 }
 
 /** Monday-start weeks covering the full month (typically 5–6 rows × 7 days). */

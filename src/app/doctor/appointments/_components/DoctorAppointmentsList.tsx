@@ -1,27 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import {
-  appointmentStatusBadgeClass,
-  appointmentStatusLabel,
-} from '@/lib/appointments/appointmentStatus';
+import { useMemo } from 'react';
+import { appointmentStatusBadgeClass } from '@/lib/appointments/appointmentStatus';
+import { appointmentStatusT } from '@/lib/appointments/appointmentStatusI18n';
 import { sumRecordedTreatmentTotal } from '@/lib/patient/appointmentCost';
+import { useTranslation } from '@/i18n/I18nContext';
 import type { Appointment, PatientProfile } from '@/types';
-
-const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-
-function formatWhen(iso: string) {
-  const d = new Date(iso);
-  return {
-    date: d.toLocaleDateString('en-US', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    }),
-    time: d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-  };
-}
 
 type Props = {
   appointments: Appointment[];
@@ -29,6 +14,25 @@ type Props = {
 };
 
 export default function DoctorAppointmentsList({ appointments, patientById }: Props) {
+  const { t, intlLocale } = useTranslation();
+  const money = useMemo(
+    () => new Intl.NumberFormat(intlLocale, { style: 'currency', currency: 'USD' }),
+    [intlLocale],
+  );
+
+  const formatWhen = (iso: string) => {
+    const d = new Date(iso);
+    return {
+      date: d.toLocaleDateString(intlLocale, {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      }),
+      time: d.toLocaleTimeString(intlLocale, { hour: '2-digit', minute: '2-digit' }),
+    };
+  };
+
   const now = new Date();
   const upcoming = appointments
     .filter((a) => new Date(a.ScheduledDateTime) >= now)
@@ -48,7 +52,7 @@ export default function DoctorAppointmentsList({ appointments, patientById }: Pr
     const patient = patientById.get(appt.PatientID);
     const patientLabel = patient
       ? `${patient.FirstName} ${patient.LastName}`
-      : `Patient #${appt.PatientID}`;
+      : t('doctor.patientNum', { id: appt.PatientID });
 
     const lineTotal = sumRecordedTreatmentTotal(appt);
 
@@ -57,23 +61,23 @@ export default function DoctorAppointmentsList({ appointments, patientById }: Pr
         <div className="flex-1 min-w-[200px]">
           <p className="font-semibold text-gray-900">{patientLabel}</p>
           <p className="text-sm text-gray-600 mt-0.5">
-            {appt.AppointmentPurpose || 'Visit'}
+            {appt.AppointmentPurpose || t('doctor.visitDefault')}
           </p>
           <p className="text-xs mt-2">
             <span className={appointmentStatusBadgeClass(appt.Status)}>
-              {appointmentStatusLabel(appt.Status)}
+              {appointmentStatusT(t, appt.Status)}
             </span>
           </p>
           {lineTotal > 0 ? (
             <p className="text-xs text-gray-600 mt-2 tabular-nums">
-              Recorded: {money.format(lineTotal)}
+              {t('doctor.appointments.recorded', { amount: money.format(lineTotal) })}
             </p>
           ) : null}
           <Link
             href={`/doctor/appointments/${appt.AppointmentID}`}
             className="inline-block mt-3 text-sm font-medium text-blue-600 hover:text-blue-800"
           >
-            Open visit →
+            {t('doctor.appointments.openVisit')}
           </Link>
         </div>
         <div className="text-right text-sm shrink-0">
@@ -107,8 +111,16 @@ export default function DoctorAppointmentsList({ appointments, patientById }: Pr
 
   return (
     <div className="space-y-10">
-      <Section title="Upcoming" items={upcoming} empty="No upcoming visits." />
-      <Section title="Past" items={past} empty="No past visits." />
+      <Section
+        title={t('doctor.appointments.sectionUpcoming')}
+        items={upcoming}
+        empty={t('doctor.appointments.emptyUpcoming')}
+      />
+      <Section
+        title={t('doctor.appointments.sectionPast')}
+        items={past}
+        empty={t('doctor.appointments.emptyPast')}
+      />
     </div>
   );
 }

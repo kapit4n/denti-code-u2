@@ -19,10 +19,12 @@ import type { PatientProfile } from '@/types';
 import DoctorWeekView from './_components/DoctorWeekView';
 import DoctorDayDiary from './_components/DoctorDayDiary';
 import DoctorMonthView from './_components/DoctorMonthView';
+import { useTranslation } from '@/i18n/I18nContext';
 
 type ViewMode = 'week' | 'month' | 'day';
 
 export default function DoctorCalendarPage() {
+  const { t, intlLocale } = useTranslation();
   const user = useAppSelector(selectCurrentUser);
   const [mode, setMode] = useState<ViewMode>('week');
   const [cursor, setCursor] = useState(() => new Date());
@@ -121,10 +123,10 @@ export default function DoctorCalendarPage() {
 
   const periodLabel =
     mode === 'week'
-      ? formatWeekRangeLabel(weekStart, weekEnd)
+      ? formatWeekRangeLabel(weekStart, weekEnd, intlLocale)
       : mode === 'month'
-        ? formatMonthYearLabel(cursor)
-        : cursor.toLocaleDateString('en-US', {
+        ? formatMonthYearLabel(cursor, intlLocale)
+        : cursor.toLocaleDateString(intlLocale, {
             weekday: 'long',
             month: 'long',
             day: 'numeric',
@@ -133,30 +135,48 @@ export default function DoctorCalendarPage() {
 
   const countLabel =
     mode === 'week'
-      ? `${weekCount} visit${weekCount === 1 ? '' : 's'} this week`
+      ? t(
+          weekCount === 1
+            ? 'doctor.calendar.visitsWeek_one'
+            : 'doctor.calendar.visitsWeek_other',
+          { count: weekCount },
+        )
       : mode === 'month'
-        ? `${monthCount} visit${monthCount === 1 ? '' : 's'} this month`
-        : `${dayCount} visit${dayCount === 1 ? '' : 's'} this day`;
+        ? t(
+            monthCount === 1
+              ? 'doctor.calendar.visitsMonth_one'
+              : 'doctor.calendar.visitsMonth_other',
+            { count: monthCount },
+          )
+        : t(
+            dayCount === 1 ? 'doctor.calendar.visitsDay_one' : 'doctor.calendar.visitsDay_other',
+            { count: dayCount },
+          );
 
   const prevAria =
-    mode === 'week' ? 'Previous week' : mode === 'month' ? 'Previous month' : 'Previous day';
+    mode === 'week'
+      ? t('doctor.calendar.prevWeek')
+      : mode === 'month'
+        ? t('doctor.calendar.prevMonth')
+        : t('doctor.calendar.prevDay');
   const nextAria =
-    mode === 'week' ? 'Next week' : mode === 'month' ? 'Next month' : 'Next day';
+    mode === 'week'
+      ? t('doctor.calendar.nextWeek')
+      : mode === 'month'
+        ? t('doctor.calendar.nextMonth')
+        : t('doctor.calendar.nextDay');
 
   return (
     <div className="max-w-6xl space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Calendar</h2>
-          <p className="text-sm text-gray-600 mt-1 max-w-xl">
-            Your primary visits only. Each block is tinted by status. Use Month for workload
-            overview, Week for the diary grid, Day for an ordered list.
-          </p>
+          <h2 className="text-2xl font-bold text-gray-900">{t('doctor.calendar.title')}</h2>
+          <p className="text-sm text-gray-600 mt-1 max-w-xl">{t('doctor.calendar.intro')}</p>
           <Link
             href="/doctor/dashboard"
             className="inline-block mt-2 text-sm font-medium text-blue-600 hover:text-blue-800"
           >
-            ← Home
+            {t('doctor.nav.backHome')}
           </Link>
         </div>
 
@@ -168,7 +188,7 @@ export default function DoctorCalendarPage() {
               mode === 'month' ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            Month
+            {t('doctor.calendar.month')}
           </button>
           <button
             type="button"
@@ -177,7 +197,7 @@ export default function DoctorCalendarPage() {
               mode === 'week' ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            Week
+            {t('doctor.calendar.week')}
           </button>
           <button
             type="button"
@@ -186,16 +206,16 @@ export default function DoctorCalendarPage() {
               mode === 'day' ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            Day
+            {t('doctor.calendar.day')}
           </button>
         </div>
       </div>
 
-      {loading && <p className="text-sm text-gray-500">Loading…</p>}
+      {loading && <p className="text-sm text-gray-500">{t('common.loading')}</p>}
 
       {!loading && !clinicDoctor && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-amber-900 text-sm">
-          Link your login to a clinic doctor record to see your schedule.
+          {t('doctor.calendar.noDoctor')}
         </div>
       )}
 
@@ -224,7 +244,7 @@ export default function DoctorCalendarPage() {
                 onClick={goToday}
                 className="ml-1 px-3 py-2 rounded-lg bg-gray-900 text-white text-xs font-semibold hover:bg-gray-800"
               >
-                Today
+                {t('doctor.calendar.today')}
               </button>
             </div>
             <div className="text-right">
@@ -256,10 +276,7 @@ export default function DoctorCalendarPage() {
           )}
 
           {mode === 'day' && (
-            <p className="text-xs text-gray-500">
-              Tip: Month shows density at a glance; Week splits the diary by day; Day is a simple
-              list.
-            </p>
+            <p className="text-xs text-gray-500">{t('doctor.calendar.dayTip')}</p>
           )}
         </>
       )}
