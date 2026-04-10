@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import AuthChecker from '@/components/AuthChecker';
+import AdminRoleChecker from '@/components/AdminRoleChecker';
 import PortalSidebarLayout from '@/components/portal/PortalSidebarLayout';
 import AdminPortalHeader from '@/app/admin/_components/AdminPortalHeader';
 import { useTranslation } from '@/i18n/I18nContext';
@@ -12,6 +13,7 @@ export default function AdminPortalShell({ children }: { children: React.ReactNo
     () => [
       { href: '/admin/dashboard', label: t('nav.dashboard') },
       { href: '/admin/patients', label: t('nav.patients') },
+      { href: '/admin/doctors', label: t('nav.doctors') },
       { href: '/admin/appointments', label: t('nav.appointments') },
       { href: '/admin/settings', label: t('nav.settings') },
       { href: '/admin/profile', label: t('nav.account') },
@@ -21,6 +23,7 @@ export default function AdminPortalShell({ children }: { children: React.ReactNo
 
   return (
     <AuthChecker>
+      <AdminRoleChecker>
       <PortalSidebarLayout
         storageKey="denti-sidebar-admin"
         navItems={navItems}
@@ -28,6 +31,7 @@ export default function AdminPortalShell({ children }: { children: React.ReactNo
       >
         {children}
       </PortalSidebarLayout>
+      </AdminRoleChecker>
     </AuthChecker>
   );
 }

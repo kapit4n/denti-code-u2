@@ -34,7 +34,7 @@ export default function AdminSettingsPage() {
     <div className="max-w-lg space-y-6">
       <div>
         <Link href="/admin/dashboard" className="text-sm font-medium text-blue-600 hover:underline">
-          {t('adminSettings.backDashboard')}
+          {t('admin.backDashboard')}
         </Link>
         <h2 className="text-2xl font-bold text-gray-900 mt-2">{t('adminSettings.title')}</h2>
         <p className="text-sm text-gray-600 mt-1">{t('adminSettings.intro')}</p>
@@ -57,8 +57,8 @@ export default function AdminSettingsPage() {
             disabled={isLoading || saving}
           >
             {(data?.supportedLocales ?? [
-              { code: 'en', label: 'English' },
-              { code: 'es', label: 'Español' },
+              { code: 'en', label: t('language.english') },
+              { code: 'es', label: t('language.spanish') },
             ]).map((opt) => (
               <option key={opt.code} value={opt.code}>
                 {opt.label}

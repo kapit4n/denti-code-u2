@@ -5,7 +5,8 @@
     "saving": "Guardando…",
     "saved": "Guardado.",
     "error": "Algo salió mal.",
-    "back": "Volver"
+    "back": "Volver",
+    "emptyValue": "—"
   },
   "nav": {
     "dashboard": "Panel",
@@ -16,7 +17,8 @@
     "home": "Inicio",
     "visits": "Visitas",
     "calendar": "Calendario",
-    "yourDetails": "Tus datos"
+    "yourDetails": "Tus datos",
+    "doctors": "Doctores"
   },
   "sidebar": {
     "brand": "Denti-Code",
@@ -44,7 +46,7 @@
     "administration": "Administración",
     "doctorSubtitle": "Tu agenda, pacientes que atiendes y documentación de visitas",
     "patientSubtitle": "Citas, tu dentista y costos de visita en un solo lugar",
-    "admin": "Admin",
+    "admin": "Administrador",
     "doctor": "Doctor",
     "patientThere": "allí",
     "hi": "Hola, {name}",
@@ -57,28 +59,81 @@
   "language": {
     "menuAria": "Idioma de la interfaz",
     "useOrgDefault": "Predeterminado de la organización",
-    "preferenceHint": "Tu elección se guarda en tu cuenta."
+    "preferenceHint": "Tu elección se guarda en tu cuenta.",
+    "english": "Inglés",
+    "spanish": "Español"
+  },
+  "admin": {
+    "backDashboard": "← Panel",
+    "loadError": "No se pudieron cargar los datos. Revisa la pasarela de la API y los servicios.",
+    "manageLink": "Gestionar →",
+    "roles": {
+      "ADMIN": "Administrador",
+      "DOCTOR": "Doctor",
+      "PATIENT": "Paciente"
+    }
   },
   "adminDashboard": {
     "title": "Resumen del panel",
-    "todayAppointments": "Citas de hoy",
-    "newPatientsMonth": "Pacientes nuevos (mes)",
-    "pendingTasks": "Tareas pendientes",
-    "revenueToday": "Ingresos (hoy)"
+    "subtitle": "Totales en vivo de todo el sistema (desde la API).",
+    "totalPatients": "Pacientes",
+    "totalDoctors": "Doctores",
+    "totalAppointments": "Citas",
+    "todayAppointments": "Citas hoy",
+    "overviewTitle": "Información general",
+    "overviewIntro": "Usa el menú lateral para ver listas completas. Los totales incluyen todos los perfiles de paciente, doctores del directorio y citas a las que tu cuenta tiene acceso.",
+    "byStatusTitle": "Citas por estado"
+  },
+  "adminPatients": {
+    "title": "Pacientes",
+    "intro": "Todos los perfiles de paciente del sistema.",
+    "colId": "ID",
+    "colName": "Nombre",
+    "colDob": "Fecha de nacimiento",
+    "colPhone": "Teléfono",
+    "colEmail": "Correo",
+    "empty": "La API no devolvió pacientes."
+  },
+  "adminDoctors": {
+    "title": "Doctores",
+    "intro": "Directorio de la clínica — todos los registros de dentistas.",
+    "colId": "ID",
+    "colName": "Nombre",
+    "colEmail": "Correo",
+    "colPhone": "Teléfono",
+    "colLicense": "Licencia",
+    "colRoom": "Consultorio",
+    "colStatus": "Estado",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "empty": "La API no devolvió doctores."
+  },
+  "adminAppointments": {
+    "title": "Citas",
+    "intro": "Todas las visitas programadas de la clínica.",
+    "colId": "ID",
+    "colWhen": "Fecha y hora",
+    "colPatient": "Paciente",
+    "colDoctor": "Doctor principal",
+    "colPurpose": "Motivo",
+    "colStatus": "Estado",
+    "empty": "La API no devolvió citas.",
+    "patientById": "Paciente #{id}",
+    "doctorById": "Doctor #{id}"
   },
   "adminSettings": {
     "title": "Ajustes de la organización",
     "intro": "Configura valores predeterminados para todos los usuarios. Cada persona puede elegir su idioma en la cabecera.",
     "defaultLanguage": "Idioma predeterminado",
-    "defaultLanguageHelp": "Se usa si el usuario no eligió un idioma personal. Las cuentas nuevas y el inicio de sesión usan este valor al cargarlo del servidor.",
-    "backDashboard": "← Panel"
+    "defaultLanguageHelp": "Se usa si el usuario no eligió un idioma personal. Las cuentas nuevas y el inicio de sesión usan este valor al cargarlo del servidor."
   },
   "adminProfile": {
     "title": "Tu cuenta",
     "intro": "Usuario activo del servicio de autenticación. Abre tu perfil desde el avatar redondo en la cabecera.",
+    "displayName": "Nombre",
+    "email": "Correo electrónico",
     "userId": "ID de usuario",
-    "roles": "Roles",
-    "backDashboard": "← Panel"
+    "roles": "Roles"
   },
   "appointmentStatus": {
     "scheduled": "Programada",

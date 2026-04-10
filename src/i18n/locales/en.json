@@ -5,7 +5,8 @@
     "saving": "Saving…",
     "saved": "Saved.",
     "error": "Something went wrong.",
-    "back": "Back"
+    "back": "Back",
+    "emptyValue": "—"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -16,7 +17,8 @@
     "home": "Home",
     "visits": "Visits",
     "calendar": "Calendar",
-    "yourDetails": "Your details"
+    "yourDetails": "Your details",
+    "doctors": "Doctors"
   },
   "sidebar": {
     "brand": "Denti-Code",
@@ -57,28 +59,81 @@
   "language": {
     "menuAria": "Display language",
     "useOrgDefault": "Organization default",
-    "preferenceHint": "Your choice is saved to your account."
+    "preferenceHint": "Your choice is saved to your account.",
+    "english": "English",
+    "spanish": "Español"
+  },
+  "admin": {
+    "backDashboard": "← Dashboard",
+    "loadError": "Could not load data. Check the API gateway and services.",
+    "manageLink": "Manage →",
+    "roles": {
+      "ADMIN": "Administrator",
+      "DOCTOR": "Doctor",
+      "PATIENT": "Patient"
+    }
   },
   "adminDashboard": {
     "title": "Dashboard overview",
-    "todayAppointments": "Today's appointments",
-    "newPatientsMonth": "New patients (month)",
-    "pendingTasks": "Pending tasks",
-    "revenueToday": "Revenue (today)"
+    "subtitle": "Live totals across the whole system (from the API).",
+    "totalPatients": "Patients",
+    "totalDoctors": "Doctors",
+    "totalAppointments": "Appointments",
+    "todayAppointments": "Appointments today",
+    "overviewTitle": "General information",
+    "overviewIntro": "Use the sidebar to open full lists. Counts below include every patient profile, doctor in the directory, and appointment record your account can access.",
+    "byStatusTitle": "Appointments by status"
+  },
+  "adminPatients": {
+    "title": "Patients",
+    "intro": "All patient profiles in the system.",
+    "colId": "ID",
+    "colName": "Name",
+    "colDob": "Date of birth",
+    "colPhone": "Phone",
+    "colEmail": "Email",
+    "empty": "No patients returned by the API."
+  },
+  "adminDoctors": {
+    "title": "Doctors",
+    "intro": "Clinic directory — every dentist record.",
+    "colId": "ID",
+    "colName": "Name",
+    "colEmail": "Email",
+    "colPhone": "Phone",
+    "colLicense": "License",
+    "colRoom": "Room",
+    "colStatus": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "empty": "No doctors returned by the API."
+  },
+  "adminAppointments": {
+    "title": "Appointments",
+    "intro": "All scheduled visits across the practice.",
+    "colId": "ID",
+    "colWhen": "Date & time",
+    "colPatient": "Patient",
+    "colDoctor": "Primary doctor",
+    "colPurpose": "Purpose",
+    "colStatus": "Status",
+    "empty": "No appointments returned by the API.",
+    "patientById": "Patient #{id}",
+    "doctorById": "Doctor #{id}"
   },
   "adminSettings": {
     "title": "Organization settings",
     "intro": "Configure defaults for every signed-in user. Individual users can still pick their own display language in the header.",
     "defaultLanguage": "Default display language",
-    "defaultLanguageHelp": "Used when a user has not chosen a personal language. New accounts and the sign-in page follow this default once loaded from the server.",
-    "backDashboard": "← Dashboard"
+    "defaultLanguageHelp": "Used when a user has not chosen a personal language. New accounts and the sign-in page follow this default once loaded from the server."
   },
   "adminProfile": {
     "title": "Your account",
     "intro": "Signed-in user from the auth service. Open your profile anytime from the round avatar in the header.",
+    "displayName": "Name",
+    "email": "Email",
     "userId": "User ID",
-    "roles": "Roles",
-    "backDashboard": "← Dashboard"
+    "roles": "Roles"
   },
   "appointmentStatus": {
     "scheduled": "Scheduled",
