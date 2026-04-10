@@ -10,6 +10,7 @@ import { appointmentsApiSlice } from '@/features/appointments/appointmentsApiSli
 import { doctorsApiSlice } from '@/features/doctors/doctorsApiSlice';
 import { proceduresApiSlice } from '@/features/procedures/proceduresApiSlice';
 import { localeApiSlice } from '@/features/locale/localeApiSlice';
+import { systemStatusApiSlice } from '@/features/systemStatus/systemStatusApiSlice';
 
 type Props = {
   className?: string;
@@ -28,6 +29,7 @@ export default function LogoutButton({ className }: Props) {
     dispatch(doctorsApiSlice.util.resetApiState());
     dispatch(proceduresApiSlice.util.resetApiState());
     dispatch(localeApiSlice.util.resetApiState());
+    dispatch(systemStatusApiSlice.util.resetApiState());
     router.push('/login');
     router.refresh();
   };

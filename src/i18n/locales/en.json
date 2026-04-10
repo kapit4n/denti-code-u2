@@ -18,7 +18,8 @@
     "visits": "Visits",
     "calendar": "Calendar",
     "yourDetails": "Your details",
-    "doctors": "Doctors"
+    "doctors": "Doctors",
+    "systemServices": "Services status"
   },
   "sidebar": {
     "brand": "Denti-Code",
@@ -120,6 +121,31 @@
     "empty": "No appointments returned by the API.",
     "patientById": "Patient #{id}",
     "doctorById": "Doctor #{id}"
+  },
+  "adminServices": {
+    "title": "Running services",
+    "intro": "TCP reachability of each backend the gateway is configured to use. “Up” means the port accepts connections; it does not validate application health beyond that.",
+    "lastChecked": "Last checked: {time}",
+    "refresh": "Refresh",
+    "forbidden": "You need an administrator account to view service status.",
+    "colService": "Service",
+    "colStatus": "Status",
+    "colAddress": "Base URL",
+    "colDetail": "Probe detail",
+    "status": {
+      "up": "Running",
+      "down": "Unreachable",
+      "not_configured": "Not configured"
+    },
+    "detailThisProcess": "This gateway process",
+    "services": {
+      "gateway": "API gateway",
+      "auth": "Authentication",
+      "patients": "Patients API",
+      "clinic": "Clinic / provider API",
+      "appointments": "Appointments API",
+      "ui": "Web UI (Next.js)"
+    }
   },
   "adminSettings": {
     "title": "Organization settings",

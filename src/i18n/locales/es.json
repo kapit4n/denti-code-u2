@@ -18,7 +18,8 @@
     "visits": "Visitas",
     "calendar": "Calendario",
     "yourDetails": "Tus datos",
-    "doctors": "Doctores"
+    "doctors": "Doctores",
+    "systemServices": "Estado de servicios"
   },
   "sidebar": {
     "brand": "Denti-Code",
@@ -120,6 +121,31 @@
     "empty": "La API no devolvió citas.",
     "patientById": "Paciente #{id}",
     "doctorById": "Doctor #{id}"
+  },
+  "adminServices": {
+    "title": "Servicios en ejecución",
+    "intro": "Alcance por TCP de cada backend configurado en la pasarela. «En ejecución» significa que el puerto acepta conexiones; no valida más allá el estado de la aplicación.",
+    "lastChecked": "Última comprobación: {time}",
+    "refresh": "Actualizar",
+    "forbidden": "Se necesita una cuenta de administrador para ver el estado de los servicios.",
+    "colService": "Servicio",
+    "colStatus": "Estado",
+    "colAddress": "URL base",
+    "colDetail": "Detalle del sondeo",
+    "status": {
+      "up": "En ejecución",
+      "down": "No accesible",
+      "not_configured": "Sin configurar"
+    },
+    "detailThisProcess": "Proceso de esta pasarela",
+    "services": {
+      "gateway": "Pasarela API",
+      "auth": "Autenticación",
+      "patients": "API de pacientes",
+      "clinic": "API de clínica / proveedores",
+      "appointments": "API de citas",
+      "ui": "Interfaz web (Next.js)"
+    }
   },
   "adminSettings": {
     "title": "Ajustes de la organización",
