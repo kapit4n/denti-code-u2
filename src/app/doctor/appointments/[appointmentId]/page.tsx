@@ -12,12 +12,32 @@ import {
   useUpdateAppointmentMutation,
 } from '@/features/appointments/appointmentsApiSlice';
 import { useGetDoctorsQuery } from '@/features/doctors/doctorsApiSlice';
-import { useGetProcedureTypesQuery } from '@/features/procedures/proceduresApiSlice';
+import {
+  useGetProcedureTypesQuery,
+  useGetTreatmentFacilitiesQuery,
+} from '@/features/procedures/proceduresApiSlice';
 import { useGetPatientsQuery } from '@/features/patients/patientsApiSlice';
 import { APPOINTMENT_STATUSES } from '@/lib/appointments/appointmentStatus';
 import { appointmentStatusT } from '@/lib/appointments/appointmentStatusI18n';
+import { buildTreatmentFacilityGroupsFromApi } from '@/lib/doctor/buildTreatmentFacilityGroups';
+import {
+  ANESTHESIA_QUICK_KEYS,
+  TREATMENT_FACILITY_GROUPS,
+} from '@/lib/doctor/treatmentFacilitiesCatalog';
+import { parseFacilityIdsFromApi } from '@/lib/doctor/parseFacilitiesUsed';
 import { useTranslation } from '@/i18n/I18nContext';
 import type { AppointmentStatus, PatientProfile, PerformedAction } from '@/types';
+
+function facilityItemLabel(
+  t: (key: string, vars?: Record<string, string | number>) => string,
+  id: string,
+  apiDisplayName?: string,
+): string {
+  const key = `doctor.facilitiesCatalog.items.${id}`;
+  const out = t(key);
+  if (out !== key) return out;
+  return apiDisplayName ?? id;
+}
 
 export default function DoctorAppointmentDetailPage() {
   const { t, intlLocale } = useTranslation();
@@ -38,7 +58,22 @@ export default function DoctorAppointmentDetailPage() {
   const user = useAppSelector(selectCurrentUser);
   const { data: doctors = [] } = useGetDoctorsQuery();
   const { data: procedures = [] } = useGetProcedureTypesQuery();
+  const { data: apiTreatmentFacilities } = useGetTreatmentFacilitiesQuery();
   const { data: patientsRaw = [] } = useGetPatientsQuery();
+
+  const facilityDisplayByCode = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const f of apiTreatmentFacilities ?? []) {
+      m.set(f.FacilityCode, f.DisplayName);
+    }
+    return m;
+  }, [apiTreatmentFacilities]);
+
+  const facilityGroups = useMemo(() => {
+    const fromApi = buildTreatmentFacilityGroupsFromApi(apiTreatmentFacilities);
+    if (fromApi && fromApi.length > 0) return fromApi;
+    return TREATMENT_FACILITY_GROUPS;
+  }, [apiTreatmentFacilities]);
 
   const clinicDoctor = useMemo(() => {
     if (!user?.email) return undefined;
@@ -61,6 +96,9 @@ export default function DoctorAppointmentDetailPage() {
   const [unitPrice, setUnitPrice] = useState('');
   const [notes, setNotes] = useState('');
   const [tooth, setTooth] = useState('');
+  const [surfaces, setSurfaces] = useState('');
+  const [anesthesia, setAnesthesia] = useState('');
+  const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
   const [formError, setFormError] = useState('');
   const [statusDraft, setStatusDraft] = useState<AppointmentStatus>('Scheduled');
   const [statusError, setStatusError] = useState('');
@@ -104,6 +142,12 @@ export default function DoctorAppointmentDetailPage() {
     }
   };
 
+  const toggleFacility = (id: string) => {
+    setSelectedFacilities((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  };
+
   const handleAddTreatment = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
@@ -131,6 +175,9 @@ export default function DoctorAppointmentDetailPage() {
           UnitPrice: price,
           ...(notes.trim() ? { Description_Notes: notes.trim() } : {}),
           ...(tooth.trim() ? { ToothInvolved: tooth.trim() } : {}),
+          ...(surfaces.trim() ? { SurfacesInvolved: surfaces.trim() } : {}),
+          ...(anesthesia.trim() ? { AnesthesiaUsed: anesthesia.trim() } : {}),
+          ...(selectedFacilities.length > 0 ? { FacilitiesUsed: selectedFacilities } : {}),
         },
       }).unwrap();
       setProcedureTypeId('');
@@ -138,6 +185,9 @@ export default function DoctorAppointmentDetailPage() {
       setUnitPrice('');
       setNotes('');
       setTooth('');
+      setSurfaces('');
+      setAnesthesia('');
+      setSelectedFacilities([]);
     } catch {
       setFormError(t('doctor.detail.errSaveTreatment'));
     }
@@ -301,7 +351,7 @@ export default function DoctorAppointmentDetailPage() {
           <div>
             <dt className="text-gray-500">{t('doctor.detail.purpose')}</dt>
             <dd className="font-medium text-gray-900">
-              {appointment.AppointmentPurpose || '—'}
+              {appointment.AppointmentPurpose || t('common.emptyValue')}
             </dd>
           </div>
           {appointment.Notes ? (
@@ -330,7 +380,9 @@ export default function DoctorAppointmentDetailPage() {
               <thead className="bg-gray-50 text-gray-600 border-b border-gray-200">
                 <tr>
                   <th className="px-4 py-3 font-medium">{t('doctor.detail.thProcedure')}</th>
-                  <th className="px-4 py-3 font-medium">{t('doctor.detail.thNotes')}</th>
+                  <th className="px-4 py-3 font-medium min-w-[220px]">
+                    {t('doctor.detail.thDetails')}
+                  </th>
                   <th className="px-4 py-3 font-medium text-right">{t('doctor.detail.thQty')}</th>
                   <th className="px-4 py-3 font-medium text-right">{t('doctor.detail.thUnit')}</th>
                   <th className="px-4 py-3 font-medium text-right">{t('doctor.detail.thLineTotal')}</th>
@@ -340,6 +392,12 @@ export default function DoctorAppointmentDetailPage() {
               <tbody>
                 {actions.map((a) => {
                   const proc = procedureById.get(a.ProcedureTypeID);
+                  const facilityIds = parseFacilityIdsFromApi(a.FacilitiesUsed);
+                  const hasDetails =
+                    Boolean(a.SurfacesInvolved) ||
+                    Boolean(a.AnesthesiaUsed) ||
+                    facilityIds.length > 0 ||
+                    Boolean(a.Description_Notes);
                   return (
                     <tr key={a.PerformedActionID} className="border-b border-gray-100">
                       <td className="px-4 py-3">
@@ -353,8 +411,48 @@ export default function DoctorAppointmentDetailPage() {
                           </div>
                         ) : null}
                       </td>
-                      <td className="px-4 py-3 text-gray-600 max-w-xs truncate">
-                        {a.Description_Notes || '—'}
+                      <td className="px-4 py-3 text-gray-700 max-w-md align-top">
+                        {a.SurfacesInvolved ? (
+                          <div className="text-xs">
+                            <span className="text-gray-500 font-medium">
+                              {t('doctor.detail.surfacesShort')}:{' '}
+                            </span>
+                            {a.SurfacesInvolved}
+                          </div>
+                        ) : null}
+                        {a.AnesthesiaUsed ? (
+                          <div className={`text-xs ${a.SurfacesInvolved ? 'mt-1' : ''}`}>
+                            <span className="text-gray-500 font-medium">
+                              {t('doctor.detail.anesthesiaShort')}:{' '}
+                            </span>
+                            {a.AnesthesiaUsed}
+                          </div>
+                        ) : null}
+                        {facilityIds.length > 0 ? (
+                          <div className="mt-2">
+                            <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">
+                              {t('doctor.detail.facilitiesShort')}
+                            </span>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {facilityIds.map((fid) => (
+                                <span
+                                  key={fid}
+                                  className="text-[11px] px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-800 border border-slate-200"
+                                >
+                                  {facilityItemLabel(t, fid, facilityDisplayByCode.get(fid))}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ) : null}
+                        {a.Description_Notes ? (
+                          <p className="text-sm text-gray-600 mt-2 whitespace-pre-wrap">
+                            {a.Description_Notes}
+                          </p>
+                        ) : null}
+                        {!hasDetails ? (
+                          <span className="text-gray-400">{t('common.emptyValue')}</span>
+                        ) : null}
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums">{a.Quantity}</td>
                       <td className="px-4 py-3 text-right tabular-nums">
@@ -386,7 +484,7 @@ export default function DoctorAppointmentDetailPage() {
         <h3 className="text-base font-semibold text-gray-900 mb-4">
           {t('doctor.detail.addTreatmentTitle')}
         </h3>
-        <form onSubmit={handleAddTreatment} className="space-y-4 max-w-xl">
+        <form onSubmit={handleAddTreatment} className="space-y-4 max-w-3xl">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="proc">
               {t('doctor.detail.procedure')}
@@ -451,6 +549,79 @@ export default function DoctorAppointmentDetailPage() {
               onChange={(e) => setTooth(e.target.value)}
               placeholder={t('doctor.detail.toothPlaceholder')}
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="surfaces">
+              {t('doctor.detail.surfacesOptional')}
+            </label>
+            <input
+              id="surfaces"
+              type="text"
+              className="w-full border rounded-lg px-3 py-2 text-gray-900"
+              value={surfaces}
+              onChange={(e) => setSurfaces(e.target.value)}
+              placeholder={t('doctor.detail.surfacesPlaceholder')}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="anesthesia">
+              {t('doctor.detail.anesthesiaLabel')}
+            </label>
+            <textarea
+              id="anesthesia"
+              rows={2}
+              className="w-full border rounded-lg px-3 py-2 text-gray-900"
+              value={anesthesia}
+              onChange={(e) => setAnesthesia(e.target.value)}
+              placeholder={t('doctor.detail.anesthesiaPlaceholder')}
+            />
+            <p className="text-xs text-gray-500 mt-1.5">{t('doctor.detail.anesthesiaQuick')}</p>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {ANESTHESIA_QUICK_KEYS.map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() =>
+                    setAnesthesia(t(`doctor.facilitiesCatalog.anesthesiaQuick.${key}`))
+                  }
+                  className="text-xs px-2.5 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-800 hover:bg-gray-100"
+                >
+                  {t(`doctor.facilitiesCatalog.anesthesiaQuick.${key}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm font-medium text-gray-900">{t('doctor.detail.facilitiesTitle')}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{t('doctor.detail.facilitiesHint')}</p>
+            </div>
+            {facilityGroups.map((group) => (
+              <fieldset
+                key={group.groupKey}
+                className="border border-gray-200 rounded-lg p-3 bg-gray-50/50"
+              >
+                <legend className="text-xs font-semibold text-gray-700 px-1">
+                  {t(group.groupKey)}
+                </legend>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                  {group.ids.map((fid) => (
+                    <label
+                      key={fid}
+                      className="flex items-start gap-2 text-sm text-gray-800 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        className="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        checked={selectedFacilities.includes(fid)}
+                        onChange={() => toggleFacility(fid)}
+                      />
+                      <span>{facilityItemLabel(t, fid, facilityDisplayByCode.get(fid))}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ))}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="tnotes">

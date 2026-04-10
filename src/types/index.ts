@@ -16,6 +16,8 @@ export interface PerformedAction {
   ToothInvolved: string | null;
   SurfacesInvolved: string | null;
   AnesthesiaUsed: string | null;
+  /** JSON string array of catalog IDs from the API */
+  FacilitiesUsed?: string | null;
   Description_Notes: string | null;
   Quantity: number;
   UnitPrice: number;
@@ -44,6 +46,8 @@ export interface CreatePerformedActionInput {
   ToothInvolved?: string;
   SurfacesInvolved?: string;
   AnesthesiaUsed?: string;
+  /** Clinical catalog IDs; sent as JSON array to the API */
+  FacilitiesUsed?: string[];
   Description_Notes?: string;
   Quantity: number;
   UnitPrice: number;
@@ -58,6 +62,16 @@ export interface ProcedureType {
   RequiresToothSpecification?: boolean;
   IsActive?: boolean;
   CategoryID?: number;
+}
+
+/** From clinic-provider `GET /treatment-facilities` (stable codes stored on performed actions). */
+export interface TreatmentFacilityDto {
+  FacilityID: number;
+  FacilityCode: string;
+  CategoryKey: string;
+  DisplayName: string;
+  SortOrder: number;
+  IsActive: boolean;
 }
 
 export interface CreateAppointmentInput {

@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '@/lib/redux/store';
-import type { ProcedureType } from '@/types';
+import type { ProcedureType, TreatmentFacilityDto } from '@/types';
 
 export const proceduresApiSlice = createApi({
   reducerPath: 'proceduresApi',
@@ -14,13 +14,17 @@ export const proceduresApiSlice = createApi({
       return headers;
     },
   }),
-  tagTypes: ['ProcedureType'],
+  tagTypes: ['ProcedureType', 'TreatmentFacility'],
   endpoints: (builder) => ({
     getProcedureTypes: builder.query<ProcedureType[], void>({
       query: () => '/procedures/types',
       providesTags: [{ type: 'ProcedureType', id: 'LIST' }],
     }),
+    getTreatmentFacilities: builder.query<TreatmentFacilityDto[], void>({
+      query: () => '/treatment-facilities',
+      providesTags: [{ type: 'TreatmentFacility', id: 'LIST' }],
+    }),
   }),
 });
 
-export const { useGetProcedureTypesQuery } = proceduresApiSlice;
+export const { useGetProcedureTypesQuery, useGetTreatmentFacilitiesQuery } = proceduresApiSlice;
