@@ -7,6 +7,7 @@ import { doctorsApiSlice } from '@/features/doctors/doctorsApiSlice';
 import { proceduresApiSlice } from '@/features/procedures/proceduresApiSlice';
 import { localeApiSlice } from '@/features/locale/localeApiSlice';
 import { systemStatusApiSlice } from '@/features/systemStatus/systemStatusApiSlice';
+import { inventoryApiSlice } from '@/features/inventory/inventoryApiSlice';
 import {
   setAuthTokenCookie,
   clearAuthTokenCookie,
@@ -37,6 +38,7 @@ export const makeStore = () => {
       [proceduresApiSlice.reducerPath]: proceduresApiSlice.reducer,
       [localeApiSlice.reducerPath]: localeApiSlice.reducer,
       [systemStatusApiSlice.reducerPath]: systemStatusApiSlice.reducer,
+      [inventoryApiSlice.reducerPath]: inventoryApiSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware()
@@ -47,7 +49,8 @@ export const makeStore = () => {
         .concat(doctorsApiSlice.middleware)
         .concat(proceduresApiSlice.middleware)
         .concat(localeApiSlice.middleware)
-        .concat(systemStatusApiSlice.middleware),
+        .concat(systemStatusApiSlice.middleware)
+        .concat(inventoryApiSlice.middleware),
   });
 };
 

@@ -74,6 +74,37 @@ export interface TreatmentFacilityDto {
   IsActive: boolean;
 }
 
+export interface ConsultoryDto {
+  ConsultoryID: number;
+  Name: string;
+  ShortCode: string | null;
+  SortOrder: number;
+  IsActive: boolean;
+}
+
+export type InventoryMovementType = 'RECEIVE' | 'REMOVE' | 'CONSUME';
+
+export interface MaterialInventoryLineDto {
+  LineID: number;
+  ConsultoryID: number;
+  FacilityID: number;
+  Quantity: number;
+  consultory: Pick<ConsultoryDto, 'ConsultoryID' | 'Name' | 'ShortCode'>;
+  facility: Pick<TreatmentFacilityDto, 'FacilityID' | 'FacilityCode' | 'DisplayName' | 'CategoryKey'>;
+}
+
+export interface InventoryMovementDto {
+  MovementID: number;
+  ConsultoryID: number;
+  FacilityID: number;
+  QuantityChange: number;
+  Type: InventoryMovementType;
+  Note: string | null;
+  createdAt: string;
+  consultory: Pick<ConsultoryDto, 'ConsultoryID' | 'Name' | 'ShortCode'>;
+  facility: Pick<TreatmentFacilityDto, 'FacilityID' | 'FacilityCode' | 'DisplayName' | 'CategoryKey'>;
+}
+
 export interface CreateAppointmentInput {
   PatientID: number;
   PrimaryDoctorID: number;

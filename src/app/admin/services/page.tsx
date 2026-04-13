@@ -87,13 +87,14 @@ export default function AdminServicesStatusPage() {
         </p>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
-          <table className="w-full text-sm text-left min-w-[560px]">
+          <table className="w-full text-sm text-left min-w-[680px]">
             <thead className="bg-gray-50 text-gray-600 border-b border-gray-200">
               <tr>
                 <th className="px-4 py-3 font-medium">{t('adminServices.colService')}</th>
                 <th className="px-4 py-3 font-medium">{t('adminServices.colStatus')}</th>
                 <th className="px-4 py-3 font-medium">{t('adminServices.colAddress')}</th>
                 <th className="px-4 py-3 font-medium">{t('adminServices.colDetail')}</th>
+                <th className="px-4 py-3 font-medium whitespace-nowrap">{t('adminServices.colEndpoints')}</th>
               </tr>
             </thead>
             <tbody>
@@ -120,6 +121,14 @@ export default function AdminServicesStatusPage() {
                     >
                       {detailLabel(t, row.detail)}
                     </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/admin/services/endpoints/${encodeURIComponent(row.id)}`}
+                      className="text-sm font-medium text-blue-600 hover:underline whitespace-nowrap"
+                    >
+                      {t('adminServices.viewEndpoints')}
+                    </Link>
                   </td>
                 </tr>
               ))}

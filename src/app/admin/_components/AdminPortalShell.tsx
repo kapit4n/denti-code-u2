@@ -16,6 +16,7 @@ export default function AdminPortalShell({ children }: { children: React.ReactNo
       { href: '/admin/doctors', label: t('nav.doctors') },
       { href: '/admin/appointments', label: t('nav.appointments') },
       { href: '/admin/services', label: t('nav.systemServices') },
+      { href: '/admin/inventory', label: t('nav.materialInventory') },
       { href: '/admin/settings', label: t('nav.settings') },
       { href: '/admin/profile', label: t('nav.account') },
     ],

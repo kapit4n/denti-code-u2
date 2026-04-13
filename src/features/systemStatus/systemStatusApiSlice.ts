@@ -1,12 +1,21 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '@/lib/redux/store';
 
+export type ServiceApiEndpoint = {
+  method: string;
+  path: string;
+  gatewayPath?: string;
+  summary?: string;
+};
+
 export type ServiceStatusRow = {
   id: string;
   displayName: string;
   baseUrl: string | null;
   status: 'up' | 'down' | 'not_configured';
   detail?: string;
+  /** Present when gateway returns the catalog (omit on older gateway builds). */
+  endpoints?: ServiceApiEndpoint[];
 };
 
 export type SystemServicesStatusResponse = {
