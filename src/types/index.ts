@@ -147,3 +147,20 @@ export interface PatientProfile {
   AvatarUrl?: string | null;
   MedicalHistorySummary?: string;
 }
+
+/** Body for POST /patients (admin or doctor). */
+export interface CreatePatientInput {
+  FirstName: string;
+  LastName: string;
+  DateOfBirth: string;
+  ContactPhone: string;
+  Email?: string;
+  Gender?: string;
+  Address?: string;
+  MedicalHistorySummary?: string;
+}
+
+export interface CreatePatientResult {
+  message: string;
+  patientId: number;
+}

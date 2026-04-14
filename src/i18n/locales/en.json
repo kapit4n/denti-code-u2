@@ -96,6 +96,28 @@
     "colEmail": "Email",
     "empty": "No patients returned by the API."
   },
+  "registerPatient": {
+    "title": "Register new patient",
+    "collapsedHint": "Tap to expand and fill the form.",
+    "toggleExpand": "Expand patient registration form",
+    "toggleCollapse": "Collapse patient registration form",
+    "introAdmin": "Create a chart record. Contact phone must be unique system-wide. Email is optional.",
+    "introDoctor": "Add a new person to the practice directory so they can be booked on visits.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "dob": "Date of birth",
+    "phone": "Contact phone",
+    "phonePlaceholder": "E.164 e.g. +15551234567",
+    "email": "Email (optional)",
+    "gender": "Gender (optional)",
+    "address": "Address (optional)",
+    "notes": "Health notes (optional)",
+    "submit": "Create patient",
+    "saving": "Creating…",
+    "success": "Patient #{id} created.",
+    "viewChart": "Open chart →",
+    "errGeneric": "Could not create patient. Check the form and try again."
+  },
   "adminDoctors": {
     "title": "Doctors",
     "intro": "Clinic directory — every dentist record.",

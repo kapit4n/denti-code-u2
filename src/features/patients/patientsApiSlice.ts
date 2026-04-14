@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '@/lib/redux/store';
-import { PatientProfile } from '@/types';
+import type { CreatePatientInput, CreatePatientResult, PatientProfile } from '@/types';
 
 export const patientsApiSlice = createApi({
   reducerPath: 'patientsApi',
@@ -45,6 +45,14 @@ export const patientsApiSlice = createApi({
       }),
       invalidatesTags: ['MyProfile'], // Invalidate the profile cache on update
     }),
+    createPatient: builder.mutation<CreatePatientResult, CreatePatientInput>({
+      query: (body) => ({
+        url: '/patients',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: [{ type: 'Patient', id: 'LIST' }],
+    }),
   }),
 });
 
@@ -53,4 +61,5 @@ export const {
   useGetPatientByIdQuery,
   useGetMyProfileQuery,
   useUpdateMyProfileMutation,
+  useCreatePatientMutation,
 } = patientsApiSlice;

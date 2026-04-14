@@ -96,6 +96,28 @@
     "colEmail": "Correo",
     "empty": "La API no devolvió pacientes."
   },
+  "registerPatient": {
+    "title": "Registrar paciente nuevo",
+    "collapsedHint": "Toca para desplegar y rellenar el formulario.",
+    "toggleExpand": "Desplegar formulario de registro de paciente",
+    "toggleCollapse": "Ocultar formulario de registro de paciente",
+    "introAdmin": "Crea la ficha. El teléfono debe ser único en el sistema. El correo es opcional.",
+    "introDoctor": "Añade a la persona al directorio de la práctica para poder citarla.",
+    "firstName": "Nombre",
+    "lastName": "Apellidos",
+    "dob": "Fecha de nacimiento",
+    "phone": "Teléfono de contacto",
+    "phonePlaceholder": "E.164 p. ej. +34600111222",
+    "email": "Correo (opcional)",
+    "gender": "Género (opcional)",
+    "address": "Dirección (opcional)",
+    "notes": "Notas de salud (opcional)",
+    "submit": "Crear paciente",
+    "saving": "Creando…",
+    "success": "Paciente #{id} creado.",
+    "viewChart": "Abrir ficha →",
+    "errGeneric": "No se pudo crear el paciente. Revisa el formulario e inténtalo de nuevo."
+  },
   "adminDoctors": {
     "title": "Doctores",
     "intro": "Directorio de la clínica — todos los registros de dentistas.",

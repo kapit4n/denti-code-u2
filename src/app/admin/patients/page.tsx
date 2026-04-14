@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 import { useGetPatientsQuery } from '@/features/patients/patientsApiSlice';
 import { useTranslation } from '@/i18n/I18nContext';
+import RegisterPatientForm from '@/components/patients/RegisterPatientForm';
 
 export default function AdminPatientsPage() {
   const { t, intlLocale } = useTranslation();
@@ -51,6 +52,8 @@ export default function AdminPatientsPage() {
           {t('admin.backDashboard')}
         </Link>
       </div>
+
+      <RegisterPatientForm variant="admin" />
 
       {rows.length === 0 ? (
         <div className="bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-500 text-sm">

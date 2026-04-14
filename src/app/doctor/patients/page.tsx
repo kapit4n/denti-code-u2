@@ -9,6 +9,7 @@ import { useGetDoctorsQuery } from '@/features/doctors/doctorsApiSlice';
 import { useGetPatientsQuery } from '@/features/patients/patientsApiSlice';
 import type { PatientProfile } from '@/types';
 import { useTranslation } from '@/i18n/I18nContext';
+import RegisterPatientForm from '@/components/patients/RegisterPatientForm';
 
 type TreatedPatient = {
   patientId: number;
@@ -75,20 +76,6 @@ export default function DoctorPatientsPage() {
     );
   }
 
-  if (!clinicDoctor) {
-    return (
-      <div className="max-w-4xl space-y-4">
-        <h2 className="text-2xl font-bold text-gray-900">{t('doctor.patients.title')}</h2>
-        <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-          {t('doctor.patients.linkDoctorHint')}
-        </p>
-        <Link href="/doctor/dashboard" className="text-sm font-medium text-blue-600 hover:underline">
-          {t('doctor.nav.backHome')}
-        </Link>
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-4xl space-y-6">
       <div>
@@ -102,7 +89,15 @@ export default function DoctorPatientsPage() {
         </Link>
       </div>
 
-      {treatedPatients.length === 0 ? (
+      <RegisterPatientForm variant="doctor" />
+
+      {!clinicDoctor ? (
+        <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+          {t('doctor.patients.linkDoctorHint')}
+        </p>
+      ) : null}
+
+      {clinicDoctor && treatedPatients.length === 0 ? (
         <div className="bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-500 text-sm">
           {t('doctor.patients.emptyBefore')}
           <Link href="/doctor/appointments" className="text-blue-600 font-medium hover:underline">
@@ -110,7 +105,9 @@ export default function DoctorPatientsPage() {
           </Link>
           {t('doctor.patients.emptyAfter')}
         </div>
-      ) : (
+      ) : null}
+
+      {clinicDoctor && treatedPatients.length > 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <table className="w-full text-sm text-left">
             <thead className="bg-gray-50 text-gray-600 border-b border-gray-200">
@@ -165,7 +162,7 @@ export default function DoctorPatientsPage() {
             </tbody>
           </table>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
