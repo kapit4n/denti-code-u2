@@ -129,6 +129,7 @@ export interface ClinicDoctor {
   Email: string;
   ContactPhone: string;
   LicenseNumber: string;
+  AvatarUrl?: string | null;
   OfficeRoomNumber?: string | null;
   IsActive?: boolean;
   SpecializationID?: number | null;
@@ -143,5 +144,6 @@ export interface PatientProfile {
   Address?: string;
   ContactPhone: string;
   Email?: string;
+  AvatarUrl?: string | null;
   MedicalHistorySummary?: string;
 }

@@ -12,6 +12,7 @@ import {
 import { sumRecordedTreatmentTotal } from '@/lib/patient/appointmentCost';
 import { useTranslation } from '@/i18n/I18nContext';
 import type { Appointment } from '@/types';
+import AvatarThumb from '@/components/AvatarThumb';
 
 interface AppointmentCardProps {
   appointment: Appointment;
@@ -22,6 +23,8 @@ interface AppointmentCardProps {
   anchorId?: boolean;
   /** Primary dentist name, e.g. from clinic directory */
   doctorLabel?: string;
+  doctorPlainName?: string;
+  doctorAvatarUrl?: string | null;
   /** Tighter layout for dashboard previews */
   compact?: boolean;
   /** Show recorded treatment total when available */
@@ -42,6 +45,8 @@ export default function AppointmentCard({
   patientActions = false,
   anchorId = true,
   doctorLabel,
+  doctorPlainName,
+  doctorAvatarUrl,
   compact = false,
   showCost = false,
 }: AppointmentCardProps) {
@@ -167,9 +172,16 @@ export default function AppointmentCard({
             </span>
           </p>
           {doctorLabel ? (
-            <p className="text-sm text-gray-700 mt-2">
-              <span className="text-gray-500">{t('patientPortal.card.dentist')} </span>
-              {doctorLabel}
+            <p className="text-sm text-gray-700 mt-2 flex items-center gap-2 min-w-0">
+              <AvatarThumb
+                src={doctorAvatarUrl}
+                name={doctorPlainName || doctorLabel}
+                size={compact ? 'xs' : 'sm'}
+              />
+              <span className="min-w-0">
+                <span className="text-gray-500">{t('patientPortal.card.dentist')} </span>
+                {doctorLabel}
+              </span>
             </p>
           ) : null}
           {showCost ? (

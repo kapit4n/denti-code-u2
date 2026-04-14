@@ -6,6 +6,7 @@ import { appointmentStatusT } from '@/lib/appointments/appointmentStatusI18n';
 import { isSameCalendarDay } from '@/lib/doctor/calendarUtils';
 import { useTranslation } from '@/i18n/I18nContext';
 import type { Appointment, PatientProfile } from '@/types';
+import AvatarThumb from '@/components/AvatarThumb';
 
 type Props = {
   day: Date;
@@ -66,14 +67,17 @@ export default function DoctorDayDiary({ day, appointments, patientById }: Props
                   <div className="w-16 shrink-0 text-sm font-semibold text-gray-900 tabular-nums">
                     {time}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900">{name}</p>
-                    <p className="text-sm text-gray-600">
-                      {a.AppointmentPurpose || t('doctor.visitDefault')}
-                    </p>
-                    <span className={`inline-block mt-1 ${appointmentStatusBadgeClass(a.Status)}`}>
-                      {appointmentStatusT(t, a.Status)}
-                    </span>
+                  <div className="flex-1 min-w-0 flex items-start gap-3">
+                    <AvatarThumb src={p?.AvatarUrl} name={name} size="sm" className="mt-0.5" />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-gray-900">{name}</p>
+                      <p className="text-sm text-gray-600">
+                        {a.AppointmentPurpose || t('doctor.visitDefault')}
+                      </p>
+                      <span className={`inline-block mt-1 ${appointmentStatusBadgeClass(a.Status)}`}>
+                        {appointmentStatusT(t, a.Status)}
+                      </span>
+                    </div>
                   </div>
                   <span className="text-xs text-blue-600 font-medium shrink-0">
                     {t('doctor.calendar.openArrow')}

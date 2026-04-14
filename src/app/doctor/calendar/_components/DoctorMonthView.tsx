@@ -9,6 +9,7 @@ import {
 } from '@/lib/doctor/calendarUtils';
 import { useTranslation } from '@/i18n/I18nContext';
 import type { Appointment, PatientProfile } from '@/types';
+import AvatarThumb from '@/components/AvatarThumb';
 
 const WEEKDAY_KEYS = [
   'weekMon',
@@ -100,10 +101,15 @@ export default function DoctorMonthView({
                       key={a.AppointmentID}
                       href={`/doctor/appointments/${a.AppointmentID}`}
                       title={`${time} — ${p ? `${p.FirstName} ${p.LastName}` : short}`}
-                      className={`block truncate rounded px-1 py-0.5 text-[10px] sm:text-xs leading-tight border shadow-sm ${appointmentStatusCalendarSurfaceClass(a.Status)}`}
+                      className={`flex items-center gap-0.5 min-w-0 truncate rounded px-1 py-0.5 text-[10px] sm:text-xs leading-tight border shadow-sm ${appointmentStatusCalendarSurfaceClass(a.Status)}`}
                     >
-                      <span className="font-semibold tabular-nums">{time}</span>{' '}
-                      <span className="text-gray-800">{short}</span>
+                      <AvatarThumb
+                        src={p?.AvatarUrl}
+                        name={p ? `${p.FirstName} ${p.LastName}` : short}
+                        size="xs"
+                      />
+                      <span className="font-semibold tabular-nums shrink-0">{time}</span>
+                      <span className="text-gray-800 truncate">{short}</span>
                     </Link>
                   );
                 })}

@@ -15,10 +15,17 @@ export default function AppointmentsList({ appointments }: AppointmentsListProps
   const { data: doctors = [] } = useGetDoctorsQuery();
 
   const doctorById = useMemo(() => {
-    const m = new Map<number, string>();
+    const m = new Map<
+      number,
+      { label: string; plainName: string; avatarUrl: string | null | undefined }
+    >();
     for (const d of doctors) {
-      const name = `${d.FirstName} ${d.LastName}`.trim();
-      m.set(d.DoctorID, t('portal.dr', { name }));
+      const plainName = `${d.FirstName} ${d.LastName}`.trim();
+      m.set(d.DoctorID, {
+        label: t('portal.dr', { name: plainName }),
+        plainName,
+        avatarUrl: d.AvatarUrl,
+      });
     }
     return m;
   }, [doctors, t]);
@@ -39,9 +46,12 @@ export default function AppointmentsList({ appointments }: AppointmentsListProps
         new Date(b.ScheduledDateTime).getTime() - new Date(a.ScheduledDateTime).getTime(),
     );
 
-  const doctorLabel = (appt: Appointment) =>
-    doctorById.get(appt.PrimaryDoctorID) ??
-    t('patientPortal.primaryDentistFallback', { id: appt.PrimaryDoctorID });
+  const doctorMeta = (appt: Appointment) =>
+    doctorById.get(appt.PrimaryDoctorID) ?? {
+      label: t('patientPortal.primaryDentistFallback', { id: appt.PrimaryDoctorID }),
+      plainName: t('patientPortal.primaryDentistFallback', { id: appt.PrimaryDoctorID }),
+      avatarUrl: undefined as string | null | undefined,
+    };
 
   return (
     <div className="space-y-10">
@@ -52,15 +62,20 @@ export default function AppointmentsList({ appointments }: AppointmentsListProps
         <p className="text-sm text-gray-500 mb-4">{t('patientPortal.list.upcomingHelp')}</p>
         {upcomingAppointments.length > 0 ? (
           <div className="space-y-4">
-            {upcomingAppointments.map((appt) => (
-              <AppointmentCard
-                key={appt.AppointmentID}
-                appointment={appt}
-                patientActions
-                doctorLabel={doctorLabel(appt)}
-                showCost
-              />
-            ))}
+            {upcomingAppointments.map((appt) => {
+              const d = doctorMeta(appt);
+              return (
+                <AppointmentCard
+                  key={appt.AppointmentID}
+                  appointment={appt}
+                  patientActions
+                  doctorLabel={d.label}
+                  doctorPlainName={d.plainName}
+                  doctorAvatarUrl={d.avatarUrl}
+                  showCost
+                />
+              );
+            })}
           </div>
         ) : (
           <p className="text-gray-500 text-sm">{t('patientPortal.list.noUpcoming')}</p>
@@ -74,16 +89,21 @@ export default function AppointmentsList({ appointments }: AppointmentsListProps
         <p className="text-sm text-gray-500 mb-4">{t('patientPortal.list.pastHelp')}</p>
         {pastAppointments.length > 0 ? (
           <div className="space-y-4">
-            {pastAppointments.map((appt) => (
-              <AppointmentCard
-                key={appt.AppointmentID}
-                appointment={appt}
-                isPast
-                patientActions
-                doctorLabel={doctorLabel(appt)}
-                showCost
-              />
-            ))}
+            {pastAppointments.map((appt) => {
+              const d = doctorMeta(appt);
+              return (
+                <AppointmentCard
+                  key={appt.AppointmentID}
+                  appointment={appt}
+                  isPast
+                  patientActions
+                  doctorLabel={d.label}
+                  doctorPlainName={d.plainName}
+                  doctorAvatarUrl={d.avatarUrl}
+                  showCost
+                />
+              );
+            })}
           </div>
         ) : (
           <p className="text-gray-500 text-sm">{t('patientPortal.list.noPast')}</p>

@@ -6,6 +6,7 @@ import { appointmentStatusT } from '@/lib/appointments/appointmentStatusI18n';
 import { isSameCalendarDay, weekDaysFrom } from '@/lib/doctor/calendarUtils';
 import { useTranslation } from '@/i18n/I18nContext';
 import type { Appointment, PatientProfile } from '@/types';
+import AvatarThumb from '@/components/AvatarThumb';
 
 type Props = {
   weekStartMonday: Date;
@@ -79,8 +80,9 @@ export default function DoctorWeekView({
                       className={`block rounded-lg border px-2 py-1.5 shadow-sm ${appointmentStatusCalendarSurfaceClass(a.Status)}`}
                     >
                       <p className="text-xs font-semibold text-gray-900 tabular-nums">{time}</p>
-                      <p className="text-xs text-gray-800 truncate" title={name}>
-                        {name}
+                      <p className="text-xs text-gray-800 truncate flex items-center gap-1 min-w-0" title={name}>
+                        <AvatarThumb src={p?.AvatarUrl} name={name} size="xs" />
+                        <span className="truncate">{name}</span>
                       </p>
                       <p className="text-[10px] text-gray-500 truncate mt-0.5">
                         {a.AppointmentPurpose || t('doctor.visitDefault')}

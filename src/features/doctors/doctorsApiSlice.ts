@@ -26,7 +26,15 @@ export const doctorsApiSlice = createApi({
             ]
           : [{ type: 'Doctor', id: 'LIST' }],
     }),
+    patchMyDoctorAvatar: builder.mutation<ClinicDoctor, { AvatarUrl: string }>({
+      query: (body) => ({
+        url: '/doctors/me/avatar',
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: [{ type: 'Doctor', id: 'LIST' }],
+    }),
   }),
 });
 
-export const { useGetDoctorsQuery } = doctorsApiSlice;
+export const { useGetDoctorsQuery, usePatchMyDoctorAvatarMutation } = doctorsApiSlice;

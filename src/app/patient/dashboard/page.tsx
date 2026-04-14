@@ -20,10 +20,17 @@ export default function PatientDashboardPage() {
   const { data: doctors = [] } = useGetDoctorsQuery();
 
   const doctorById = useMemo(() => {
-    const m = new Map<number, string>();
+    const m = new Map<
+      number,
+      { label: string; plainName: string; avatarUrl: string | null | undefined }
+    >();
     for (const d of doctors) {
-      const name = `${d.FirstName} ${d.LastName}`.trim();
-      m.set(d.DoctorID, t('portal.dr', { name }));
+      const plainName = `${d.FirstName} ${d.LastName}`.trim();
+      m.set(d.DoctorID, {
+        label: t('portal.dr', { name: plainName }),
+        plainName,
+        avatarUrl: d.AvatarUrl,
+      });
     }
     return m;
   }, [doctors, t]);
@@ -89,20 +96,31 @@ export default function PatientDashboardPage() {
 
             {!apptError && upcomingPreview.length > 0 && (
               <ul className="space-y-3">
-                {upcomingPreview.map((appt) => (
-                  <li key={appt.AppointmentID}>
-                    <AppointmentCard
-                      appointment={appt}
-                      patientActions
-                      compact
-                      doctorLabel={
-                        doctorById.get(appt.PrimaryDoctorID) ??
-                        t('patientPortal.primaryDentistFallback', { id: appt.PrimaryDoctorID })
-                      }
-                      showCost
-                    />
-                  </li>
-                ))}
+                {upcomingPreview.map((appt) => {
+                  const d =
+                    doctorById.get(appt.PrimaryDoctorID) ?? {
+                      label: t('patientPortal.primaryDentistFallback', {
+                        id: appt.PrimaryDoctorID,
+                      }),
+                      plainName: t('patientPortal.primaryDentistFallback', {
+                        id: appt.PrimaryDoctorID,
+                      }),
+                      avatarUrl: undefined as string | null | undefined,
+                    };
+                  return (
+                    <li key={appt.AppointmentID}>
+                      <AppointmentCard
+                        appointment={appt}
+                        patientActions
+                        compact
+                        doctorLabel={d.label}
+                        doctorPlainName={d.plainName}
+                        doctorAvatarUrl={d.avatarUrl}
+                        showCost
+                      />
+                    </li>
+                  );
+                })}
               </ul>
             )}
 

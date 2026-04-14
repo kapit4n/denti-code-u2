@@ -7,6 +7,7 @@ import { appointmentStatusT } from '@/lib/appointments/appointmentStatusI18n';
 import { sumRecordedTreatmentTotal } from '@/lib/patient/appointmentCost';
 import { useTranslation } from '@/i18n/I18nContext';
 import type { Appointment, PatientProfile } from '@/types';
+import AvatarThumb from '@/components/AvatarThumb';
 
 type Props = {
   appointments: Appointment[];
@@ -58,7 +59,9 @@ export default function DoctorAppointmentsList({ appointments, patientById }: Pr
 
     return (
       <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-wrap gap-4 justify-between items-start">
-        <div className="flex-1 min-w-[200px]">
+        <div className="flex-1 min-w-[200px] flex gap-3 items-start">
+          <AvatarThumb src={patient?.AvatarUrl} name={patientLabel} size="sm" className="mt-0.5" />
+          <div className="min-w-0 flex-1">
           <p className="font-semibold text-gray-900">{patientLabel}</p>
           <p className="text-sm text-gray-600 mt-0.5">
             {appt.AppointmentPurpose || t('doctor.visitDefault')}
@@ -79,6 +82,7 @@ export default function DoctorAppointmentsList({ appointments, patientById }: Pr
           >
             {t('doctor.appointments.openVisit')}
           </Link>
+          </div>
         </div>
         <div className="text-right text-sm shrink-0">
           <p className="font-medium text-gray-800">{date}</p>

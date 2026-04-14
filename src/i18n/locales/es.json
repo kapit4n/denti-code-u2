@@ -511,7 +511,14 @@
       "title": "Tu cuenta",
       "intro": "Identidad de acceso al portal. La agenda clínica y los pacientes usan tu registro de doctor en la clínica (coincidencia por correo). Abre esta página desde el avatar en la cabecera.",
       "userId": "ID de usuario",
-      "roles": "Roles"
+      "roles": "Roles",
+      "clinicCardTitle": "Foto en la ficha clínica",
+      "noClinicRecord": "Aún no hay un doctor con tu correo de acceso; no se puede guardar la foto de directorio.",
+      "avatarChoose": "Subir foto",
+      "avatarRemove": "Quitar foto",
+      "avatarUploading": "Subiendo…",
+      "avatarHint": "JPEG, PNG o WebP, hasta 2 MB. Se muestra en visitas y calendarios junto a tus pacientes.",
+      "avatarError": "No se pudo actualizar la foto. Inténtalo de nuevo."
     }
   },
   "patientPortal": {
@@ -591,6 +598,7 @@
       "loadError": "No se pudieron cargar tus datos. Inténtalo de nuevo."
     },
     "profileView": {
+      "avatarCaption": "Tu foto en el portal y en las fichas de visita que ven tus dentistas.",
       "sectionTitle": "Contacto y notas de salud",
       "edit": "Editar",
       "emailHint": "Se usa para iniciar sesión; cámbialo en la clínica si hace falta.",
@@ -600,6 +608,13 @@
     "profileForm": {
       "title": "Editar tus datos",
       "intro": "Actualiza cómo deben contactarte recepción y el equipo clínico y documentar tu atención.",
+      "avatar": "Foto de perfil",
+      "avatarChoose": "Subir foto",
+      "avatarRemove": "Quitar foto",
+      "avatarUploading": "Subiendo…",
+      "avatarHint": "JPEG, PNG o WebP, hasta 2 MB. Tu dentista la ve en las listas de visitas.",
+      "avatarUploadError": "Error al subir. Revisa el archivo e inténtalo de nuevo.",
+      "avatarSaveError": "La foto se subió pero no se pudo guardar en tu perfil.",
       "firstName": "Nombre",
       "lastName": "Apellidos",
       "contactPhone": "Teléfono de contacto",

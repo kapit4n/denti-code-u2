@@ -3,6 +3,7 @@
 import type { PatientProfile } from '@/types';
 import { formatDobDisplay } from '@/lib/doctor/clinicalFormat';
 import { useTranslation } from '@/i18n/I18nContext';
+import AvatarThumb from '@/components/AvatarThumb';
 
 interface ProfileViewProps {
   profile: PatientProfile;
@@ -16,8 +17,14 @@ export default function ProfileView({ profile, onEdit }: ProfileViewProps) {
     ? formatDobDisplay(profile.DateOfBirth, intlLocale)
     : t('patientPortal.notProvided');
 
+  const displayName = `${profile.FirstName} ${profile.LastName}`.trim();
+
   return (
     <div>
+      <div className="flex items-center gap-4 mb-6">
+        <AvatarThumb src={profile.AvatarUrl} name={displayName || profile.Email || 'Patient'} size="md" />
+        <p className="text-sm text-gray-500">{t('patientPortal.profileView.avatarCaption')}</p>
+      </div>
       <div className="flex justify-between items-center mb-6 gap-3">
         <h3 className="text-lg font-semibold text-gray-900">
           {t('patientPortal.profileView.sectionTitle')}

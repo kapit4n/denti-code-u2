@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { PatientProfile } from '@/types';
 import { formatDobDisplay } from '@/lib/doctor/clinicalFormat';
 import { useTranslation } from '@/i18n/I18nContext';
+import AvatarThumb from '@/components/AvatarThumb';
 
 type Props = {
   profile: PatientProfile;
@@ -12,10 +13,15 @@ type Props = {
 export default function PatientInfoSummary({ profile }: Props) {
   const { t, intlLocale } = useTranslation();
 
+  const displayName = `${profile.FirstName} ${profile.LastName}`.trim();
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
       <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">{t('patientPortal.infoSummary.title')}</h2>
+        <div className="flex items-center gap-3 min-w-0">
+          <AvatarThumb src={profile.AvatarUrl} name={displayName || profile.Email || 'Patient'} size="md" />
+          <h2 className="text-lg font-semibold text-gray-900">{t('patientPortal.infoSummary.title')}</h2>
+        </div>
         <Link
           href="/patient/profile"
           className="text-sm font-medium text-blue-600 hover:text-blue-800"

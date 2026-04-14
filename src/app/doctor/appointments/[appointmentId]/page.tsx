@@ -28,6 +28,7 @@ import { parseFacilityIdsFromApi } from '@/lib/doctor/parseFacilitiesUsed';
 import { useGetInventoryLinesQuery } from '@/features/inventory/inventoryApiSlice';
 import { useTranslation } from '@/i18n/I18nContext';
 import type { AppointmentStatus, PatientProfile, PerformedAction } from '@/types';
+import AvatarThumb from '@/components/AvatarThumb';
 
 function facilityItemLabel(
   t: (key: string, vars?: Record<string, string | number>) => string,
@@ -324,12 +325,19 @@ export default function DoctorAppointmentDetailPage() {
             <dt className="text-gray-500">{t('doctor.detail.patient')}</dt>
             <dd className="font-medium text-gray-900 mt-0.5">
               {patient ? (
-                <Link
-                  href={`/doctor/patients/${appointment.PatientID}`}
-                  className="text-blue-600 hover:text-blue-800 hover:underline"
-                >
-                  {patient.FirstName} {patient.LastName}
-                </Link>
+                <span className="inline-flex items-center gap-2">
+                  <AvatarThumb
+                    src={patient.AvatarUrl}
+                    name={`${patient.FirstName} ${patient.LastName}`}
+                    size="sm"
+                  />
+                  <Link
+                    href={`/doctor/patients/${appointment.PatientID}`}
+                    className="text-blue-600 hover:text-blue-800 hover:underline"
+                  >
+                    {patient.FirstName} {patient.LastName}
+                  </Link>
+                </span>
               ) : (
                 t('doctor.detail.patientId', { id: appointment.PatientID })
               )}

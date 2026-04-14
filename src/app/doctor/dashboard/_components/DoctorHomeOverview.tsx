@@ -11,6 +11,7 @@ import { appointmentStatusBadgeClass } from '@/lib/appointments/appointmentStatu
 import { appointmentStatusT } from '@/lib/appointments/appointmentStatusI18n';
 import { useTranslation } from '@/i18n/I18nContext';
 import type { Appointment, PatientProfile } from '@/types';
+import AvatarThumb from '@/components/AvatarThumb';
 
 const UPCOMING_PREVIEW = 6;
 
@@ -123,14 +124,17 @@ export default function DoctorHomeOverview() {
                     key={a.AppointmentID}
                     className="px-4 py-3 flex flex-wrap items-center justify-between gap-3 hover:bg-gray-50/80"
                   >
-                    <div className="min-w-0">
-                      <p className="font-medium text-gray-900">{label}</p>
-                      <p className="text-xs text-gray-500 truncate">
-                        {a.AppointmentPurpose || t('doctor.visitDefault')}
-                      </p>
-                      <span className={`mt-1 ${appointmentStatusBadgeClass(a.Status)}`}>
-                        {appointmentStatusT(t, a.Status)}
-                      </span>
+                    <div className="min-w-0 flex items-start gap-3 flex-1">
+                      <AvatarThumb src={p?.AvatarUrl} name={label} size="sm" className="mt-0.5" />
+                      <div className="min-w-0">
+                        <p className="font-medium text-gray-900">{label}</p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {a.AppointmentPurpose || t('doctor.visitDefault')}
+                        </p>
+                        <span className={`mt-1 ${appointmentStatusBadgeClass(a.Status)}`}>
+                          {appointmentStatusT(t, a.Status)}
+                        </span>
+                      </div>
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-sm font-medium text-gray-800">{whenStr}</p>

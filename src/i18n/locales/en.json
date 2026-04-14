@@ -511,7 +511,14 @@
       "title": "Your account",
       "intro": "Login identity for the portal. Clinical scheduling and patients use your clinic doctor record (matched by email). Open this page from the avatar in the header.",
       "userId": "User ID",
-      "roles": "Roles"
+      "roles": "Roles",
+      "clinicCardTitle": "Clinic profile photo",
+      "noClinicRecord": "No doctor row matches your login email yet, so a directory photo cannot be saved.",
+      "avatarChoose": "Upload photo",
+      "avatarRemove": "Remove photo",
+      "avatarUploading": "Uploading…",
+      "avatarHint": "JPEG, PNG, or WebP, up to 2 MB. Shown on visits and calendars next to your patients.",
+      "avatarError": "Could not update photo. Try again."
     }
   },
   "patientPortal": {
@@ -591,6 +598,7 @@
       "loadError": "Could not load your details. Please try again."
     },
     "profileView": {
+      "avatarCaption": "Your photo in the portal and on visit cards your dentists see.",
       "sectionTitle": "Contact & health notes",
       "edit": "Edit",
       "emailHint": "Used to sign in; change via clinic if needed.",
@@ -600,6 +608,13 @@
     "profileForm": {
       "title": "Edit your details",
       "intro": "Update what the front desk and clinical team should use to reach you and document your care.",
+      "avatar": "Profile photo",
+      "avatarChoose": "Upload photo",
+      "avatarRemove": "Remove photo",
+      "avatarUploading": "Uploading…",
+      "avatarHint": "JPEG, PNG, or WebP, up to 2 MB. Your dentist sees this on visit lists.",
+      "avatarUploadError": "Upload failed. Check the file and try again.",
+      "avatarSaveError": "Photo uploaded but could not save to your profile.",
       "firstName": "First name",
       "lastName": "Last name",
       "contactPhone": "Contact phone",
