@@ -25,6 +25,7 @@ import {
   TREATMENT_FACILITY_GROUPS,
 } from '@/lib/doctor/treatmentFacilitiesCatalog';
 import { parseFacilityIdsFromApi } from '@/lib/doctor/parseFacilitiesUsed';
+import { useGetInventoryLinesQuery } from '@/features/inventory/inventoryApiSlice';
 import { useTranslation } from '@/i18n/I18nContext';
 import type { AppointmentStatus, PatientProfile, PerformedAction } from '@/types';
 
@@ -59,6 +60,16 @@ export default function DoctorAppointmentDetailPage() {
   const { data: doctors = [] } = useGetDoctorsQuery();
   const { data: procedures = [] } = useGetProcedureTypesQuery();
   const { data: apiTreatmentFacilities } = useGetTreatmentFacilitiesQuery();
+  // Inventory is tracked per consultory. For now, doctor UI uses a single configured consultory (default 1).
+  const inventoryConsultoryId = Number.parseInt(
+    process.env.NEXT_PUBLIC_INVENTORY_CONSULTORY_ID ?? '1',
+    10,
+  );
+  const { data: inventoryLines = [] } = useGetInventoryLinesQuery(
+    Number.isFinite(inventoryConsultoryId) && inventoryConsultoryId > 0
+      ? { consultoryId: inventoryConsultoryId }
+      : undefined,
+  );
   const { data: patientsRaw = [] } = useGetPatientsQuery();
 
   const facilityDisplayByCode = useMemo(() => {
@@ -74,6 +85,18 @@ export default function DoctorAppointmentDetailPage() {
     if (fromApi && fromApi.length > 0) return fromApi;
     return TREATMENT_FACILITY_GROUPS;
   }, [apiTreatmentFacilities]);
+
+  const inventoryQtyByCode = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const line of inventoryLines) {
+      const code = line.facility?.FacilityCode;
+      if (!code) continue;
+      m.set(code, line.Quantity ?? 0);
+    }
+    return m;
+  }, [inventoryLines]);
+
+  const lowStockThreshold = 5;
 
   const clinicDoctor = useMemo(() => {
     if (!user?.email) return undefined;
@@ -608,20 +631,43 @@ export default function DoctorAppointmentDetailPage() {
                   {group.ids.map((fid) => (
                     <label
                       key={fid}
-                      className="flex items-start gap-2 text-sm text-gray-800 cursor-pointer"
+                      className={`flex items-start gap-2 text-sm cursor-pointer ${
+                        (inventoryQtyByCode.get(fid) ?? 0) <= 0 ? 'text-gray-400' : 'text-gray-800'
+                      }`}
                     >
                       <input
                         type="checkbox"
                         className="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         checked={selectedFacilities.includes(fid)}
                         onChange={() => toggleFacility(fid)}
+                        disabled={(inventoryQtyByCode.get(fid) ?? 0) <= 0}
                       />
-                      <span>{facilityItemLabel(t, fid, facilityDisplayByCode.get(fid))}</span>
+                      <span className="flex flex-wrap items-center gap-2">
+                        <span>{facilityItemLabel(t, fid, facilityDisplayByCode.get(fid))}</span>
+                        <span
+                          className={`text-[11px] px-1.5 py-0.5 rounded-md border font-mono tabular-nums ${
+                            (inventoryQtyByCode.get(fid) ?? 0) <= 0
+                              ? 'bg-red-50 text-red-700 border-red-200'
+                              : (inventoryQtyByCode.get(fid) ?? 0) <= lowStockThreshold
+                                ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          }`}
+                          title={t('doctor.detail.inventoryQtyTitle')}
+                        >
+                          {t('doctor.detail.inventoryQty', { qty: inventoryQtyByCode.get(fid) ?? 0 })}
+                        </span>
+                      </span>
                     </label>
                   ))}
                 </div>
               </fieldset>
             ))}
+            <p className="text-xs text-gray-500">
+              {t('doctor.detail.inventoryHint')}{' '}
+              <Link href="/admin/inventory" className="text-blue-600 hover:underline">
+                {t('doctor.detail.inventoryLink')}
+              </Link>
+            </p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="tnotes">
