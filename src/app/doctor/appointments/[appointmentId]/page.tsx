@@ -337,6 +337,15 @@ export default function DoctorAppointmentDetailPage() {
                   >
                     {patient.FirstName} {patient.LastName}
                   </Link>
+                  <span className="text-gray-400" aria-hidden>
+                    {' · '}
+                  </span>
+                  <Link
+                    href={`/doctor/patients/${appointment.PatientID}#patient-edit`}
+                    className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                  >
+                    {t('doctor.patients.edit')}
+                  </Link>
                 </span>
               ) : (
                 t('doctor.detail.patientId', { id: appointment.PatientID })

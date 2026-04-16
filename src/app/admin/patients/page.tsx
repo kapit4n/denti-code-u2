@@ -69,6 +69,7 @@ export default function AdminPatientsPage() {
                 <th className="px-4 py-3 font-medium">{t('adminPatients.colDob')}</th>
                 <th className="px-4 py-3 font-medium">{t('adminPatients.colPhone')}</th>
                 <th className="px-4 py-3 font-medium">{t('adminPatients.colEmail')}</th>
+                <th className="px-4 py-3 font-medium w-28">{t('adminPatients.colActions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -76,7 +77,12 @@ export default function AdminPatientsPage() {
                 <tr key={p.PatientID} className="border-b border-gray-100 hover:bg-gray-50/80">
                   <td className="px-4 py-3 tabular-nums text-gray-600">{p.PatientID}</td>
                   <td className="px-4 py-3 font-medium text-gray-900">
-                    {p.FirstName} {p.LastName}
+                    <Link
+                      href={`/admin/patients/${p.PatientID}`}
+                      className="text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      {p.FirstName} {p.LastName}
+                    </Link>
                   </td>
                   <td className="px-4 py-3 text-gray-600">
                     {p.DateOfBirth
@@ -92,6 +98,14 @@ export default function AdminPatientsPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-600 truncate max-w-[220px]">
                     {p.Email || t('common.emptyValue')}
+                  </td>
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/admin/patients/${p.PatientID}`}
+                      className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                    >
+                      {t('adminPatients.edit')}
+                    </Link>
                   </td>
                 </tr>
               ))}

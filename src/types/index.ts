@@ -148,6 +148,37 @@ export interface PatientProfile {
   MedicalHistorySummary?: string;
 }
 
+export type PaymentMethod =
+  | 'Cash'
+  | 'Card'
+  | 'Transfer'
+  | 'Insurance'
+  | 'Other';
+
+export interface Payment {
+  PaymentID: number;
+  PatientID: number;
+  /** Positive amount in major currency units (e.g. dollars). */
+  Amount: number;
+  Method: PaymentMethod | null;
+  Note: string | null;
+  /** ISO string. */
+  PaidAt: string;
+  /** Optional linkage to an appointment/visit when available. */
+  AppointmentID?: number | null;
+}
+
+/** Body for POST /payments. */
+export interface CreatePaymentInput {
+  PatientID: number;
+  Amount: number;
+  Method?: PaymentMethod;
+  Note?: string;
+  /** ISO string; if omitted, backend should default to now. */
+  PaidAt?: string;
+  AppointmentID?: number | null;
+}
+
 /** Body for POST /patients (admin or doctor). */
 export interface CreatePatientInput {
   FirstName: string;
@@ -164,3 +195,16 @@ export interface CreatePatientResult {
   message: string;
   patientId: number;
 }
+
+/** Fields staff may change via PUT /patients/:id (merged server-side). Null clears optional fields. */
+export type StaffPatientUpdateBody = Partial<{
+  FirstName: string;
+  LastName: string;
+  DateOfBirth: string;
+  Gender: string | null;
+  Address: string | null;
+  ContactPhone: string;
+  Email: string | null;
+  MedicalHistorySummary: string | null;
+  AvatarUrl: string | null;
+}>;

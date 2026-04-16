@@ -116,7 +116,9 @@ export default function DoctorPatientsPage() {
                 <th className="px-4 py-3 font-medium">{t('doctor.patients.colPhone')}</th>
                 <th className="px-4 py-3 font-medium text-right">{t('doctor.patients.colVisits')}</th>
                 <th className="px-4 py-3 font-medium">{t('doctor.patients.colLastSeen')}</th>
-                <th className="px-4 py-3 w-28" />
+                <th className="px-4 py-3 text-right font-medium min-w-[140px]">
+                  {t('doctor.patients.colActions')}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -149,13 +151,21 @@ export default function DoctorPatientsPage() {
                         })
                       : '—'}
                   </td>
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/doctor/patients/${row.patientId}`}
-                      className="text-blue-600 hover:text-blue-800 font-medium text-sm"
-                    >
-                      {t('doctor.patients.open')}
-                    </Link>
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex flex-wrap justify-end gap-x-3 gap-y-1">
+                      <Link
+                        href={`/doctor/patients/${row.patientId}`}
+                        className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                      >
+                        {t('doctor.patients.open')}
+                      </Link>
+                      <Link
+                        href={`/doctor/patients/${row.patientId}#patient-edit`}
+                        className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                      >
+                        {t('doctor.patients.edit')}
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}

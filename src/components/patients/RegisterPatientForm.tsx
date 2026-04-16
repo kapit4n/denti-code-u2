@@ -265,6 +265,14 @@ export default function RegisterPatientForm({ variant, className = '' }: Props) 
               {t('registerPatient.viewChart')}
             </Link>
           ) : null}
+          {variant === 'admin' && createdId !== null ? (
+            <Link
+              href={`/admin/patients/${createdId}`}
+              className="text-sm font-medium text-blue-600 hover:underline"
+            >
+              {t('adminPatients.edit')}
+            </Link>
+          ) : null}
         </div>
           </form>
         </div>

@@ -1,6 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '@/lib/redux/store';
-import type { CreatePatientInput, CreatePatientResult, PatientProfile } from '@/types';
+import type {
+  CreatePatientInput,
+  CreatePatientResult,
+  PatientProfile,
+  StaffPatientUpdateBody,
+} from '@/types';
 
 export const patientsApiSlice = createApi({
   reducerPath: 'patientsApi',
@@ -53,6 +58,17 @@ export const patientsApiSlice = createApi({
       }),
       invalidatesTags: [{ type: 'Patient', id: 'LIST' }],
     }),
+    updatePatient: builder.mutation<PatientProfile, { id: number; body: StaffPatientUpdateBody }>({
+      query: ({ id, body }) => ({
+        url: `/patients/${id}`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: (_result, _err, { id }) => [
+        { type: 'Patient', id },
+        { type: 'Patient', id: 'LIST' },
+      ],
+    }),
   }),
 });
 
@@ -62,4 +78,5 @@ export const {
   useGetMyProfileQuery,
   useUpdateMyProfileMutation,
   useCreatePatientMutation,
+  useUpdatePatientMutation,
 } = patientsApiSlice;

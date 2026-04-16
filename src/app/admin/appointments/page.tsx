@@ -108,7 +108,21 @@ export default function AdminAppointmentsPage() {
                     <td className="px-4 py-3 text-gray-800 whitespace-nowrap">
                       {formatWhen(a.ScheduledDateTime)}
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-900">{patientLabel}</td>
+                    <td className="px-4 py-3 font-medium text-gray-900">
+                      {patient ? (
+                        <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                          <span>{patientLabel}</span>
+                          <Link
+                            href={`/admin/patients/${a.PatientID}`}
+                            className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline shrink-0"
+                          >
+                            {t('adminPatients.edit')}
+                          </Link>
+                        </span>
+                      ) : (
+                        patientLabel
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-gray-700">{doctorLabel}</td>
                     <td className="px-4 py-3 text-gray-600 max-w-[200px] truncate">
                       {a.AppointmentPurpose || t('common.emptyValue')}
