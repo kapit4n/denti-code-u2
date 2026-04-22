@@ -12,6 +12,8 @@ type Props = {
   weekStartMonday: Date;
   appointments: Appointment[];
   patientById: Map<number, PatientProfile>;
+  /** Double-click empty area of a day column (not on a visit link) to book a visit. */
+  onDayBodyDoubleClick?: (day: Date) => void;
 };
 
 function appointmentsForDay(appointments: Appointment[], day: Date): Appointment[] {
@@ -27,6 +29,7 @@ export default function DoctorWeekView({
   weekStartMonday,
   appointments,
   patientById,
+  onDayBodyDoubleClick,
 }: Props) {
   const { t, intlLocale } = useTranslation();
   const days = weekDaysFrom(weekStartMonday);
@@ -47,18 +50,31 @@ export default function DoctorWeekView({
         return (
           <div
             key={day.toISOString()}
-            className={`rounded-xl border min-h-[140px] flex flex-col ${
+            className={`rounded-xl border min-h-[140px] flex flex-col select-none ${
               isToday ? 'border-blue-400 bg-blue-50/40 ring-1 ring-blue-200' : 'border-gray-200 bg-white'
             }`}
+            title={onDayBodyDoubleClick ? t('doctor.calendar.dblClickNewVisit') : undefined}
           >
             <div
               className={`px-2 py-2 border-b text-center text-xs font-semibold ${
                 isToday ? 'border-blue-200 text-blue-900' : 'border-gray-100 text-gray-700'
               }`}
+              onDoubleClick={(e) => {
+                if (!onDayBodyDoubleClick) return;
+                if ((e.target as HTMLElement).closest('a')) return;
+                onDayBodyDoubleClick(day);
+              }}
             >
               {header}
             </div>
-            <div className="flex-1 p-2 space-y-2 overflow-y-auto max-h-[min(420px,50vh)]">
+            <div
+              className="flex-1 p-2 space-y-2 overflow-y-auto max-h-[min(420px,50vh)]"
+              onDoubleClick={(e) => {
+                if (!onDayBodyDoubleClick) return;
+                if ((e.target as HTMLElement).closest('a')) return;
+                onDayBodyDoubleClick(day);
+              }}
+            >
               {dayAppts.length === 0 ? (
                 <p className="text-xs text-gray-400 text-center py-4">—</p>
               ) : (

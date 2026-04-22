@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useAppSelector } from '@/lib/redux/hooks';
 import { selectCurrentUser } from '@/features/auth/authSlice';
 import { useGetAppointmentsQuery } from '@/features/appointments/appointmentsApiSlice';
@@ -14,12 +14,14 @@ import {
   formatWeekRangeLabel,
   startOfMonth,
   startOfWeekMonday,
+  toDatetimeLocalValue,
 } from '@/lib/doctor/calendarUtils';
 import type { PatientProfile } from '@/types';
 import DoctorWeekView from './_components/DoctorWeekView';
 import DoctorDayDiary from './_components/DoctorDayDiary';
 import DoctorMonthView from './_components/DoctorMonthView';
 import { useTranslation } from '@/i18n/I18nContext';
+import CreateAppointmentModal from '@/app/doctor/appointments/_components/CreateAppointmentModal';
 
 type ViewMode = 'week' | 'month' | 'day';
 
@@ -28,6 +30,8 @@ export default function DoctorCalendarPage() {
   const user = useAppSelector(selectCurrentUser);
   const [mode, setMode] = useState<ViewMode>('week');
   const [cursor, setCursor] = useState(() => new Date());
+  const [createVisitOpen, setCreateVisitOpen] = useState(false);
+  const [createVisitInitialWhen, setCreateVisitInitialWhen] = useState<string | null>(null);
 
   const { data: doctors = [], isLoading: docLoading } = useGetDoctorsQuery();
   const { data: appointments = [], isLoading: apptLoading } = useGetAppointmentsQuery();
@@ -84,6 +88,18 @@ export default function DoctorCalendarPage() {
   };
 
   const goToday = () => setCursor(new Date());
+
+  const openCreateVisit = useCallback((day: Date, hour = 9, minute = 0) => {
+    const d = new Date(day);
+    d.setHours(hour, minute, 0, 0);
+    setCreateVisitInitialWhen(toDatetimeLocalValue(d));
+    setCreateVisitOpen(true);
+  }, []);
+
+  const closeCreateVisit = useCallback(() => {
+    setCreateVisitOpen(false);
+    setCreateVisitInitialWhen(null);
+  }, []);
 
   const loading = docLoading || apptLoading;
 
@@ -258,6 +274,7 @@ export default function DoctorCalendarPage() {
               weekStartMonday={weekStart}
               appointments={myAppointments}
               patientById={patientById}
+              onDayBodyDoubleClick={(day) => openCreateVisit(day, 9, 0)}
             />
           )}
           {mode === 'month' && (
@@ -265,6 +282,7 @@ export default function DoctorCalendarPage() {
               monthAnchor={cursor}
               appointments={myAppointments}
               patientById={patientById}
+              onDayCellDoubleClick={(day) => openCreateVisit(day, 9, 0)}
             />
           )}
           {mode === 'day' && (
@@ -272,12 +290,23 @@ export default function DoctorCalendarPage() {
               day={cursor}
               appointments={myAppointments}
               patientById={patientById}
+              onSlotDoubleClick={(day, hour) => openCreateVisit(day, hour, 0)}
             />
           )}
 
-          {mode === 'day' && (
-            <p className="text-xs text-gray-500">{t('doctor.calendar.dayTip')}</p>
-          )}
+          <div className="text-xs text-gray-500 space-y-1">
+            <p>{t('doctor.calendar.createVisitHint')}</p>
+            {mode === 'day' ? <p>{t('doctor.calendar.dayTip')}</p> : null}
+          </div>
+          {clinicDoctor ? (
+            <CreateAppointmentModal
+              open={createVisitOpen}
+              onClose={closeCreateVisit}
+              doctorId={clinicDoctor.DoctorID}
+              patients={patients}
+              initialScheduledLocal={createVisitInitialWhen}
+            />
+          ) : null}
         </>
       )}
     </div>

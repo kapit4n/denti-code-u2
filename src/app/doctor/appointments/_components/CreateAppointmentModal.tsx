@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
 import { useCreateAppointmentMutation } from '@/features/appointments/appointmentsApiSlice';
 import { NEW_APPOINTMENT_STATUSES } from '@/lib/appointments/appointmentStatus';
 import { appointmentStatusT } from '@/lib/appointments/appointmentStatusI18n';
@@ -12,6 +13,8 @@ type Props = {
   onClose: () => void;
   doctorId: number;
   patients: PatientProfile[];
+  /** When the modal opens, prefill the datetime-local field (local time). */
+  initialScheduledLocal?: string | null;
 };
 
 export default function CreateAppointmentModal({
@@ -19,6 +22,7 @@ export default function CreateAppointmentModal({
   onClose,
   doctorId,
   patients,
+  initialScheduledLocal,
 }: Props) {
   const { t } = useTranslation();
   const [patientId, setPatientId] = useState('');
@@ -30,9 +34,16 @@ export default function CreateAppointmentModal({
   const [error, setError] = useState('');
   const [createAppointment, { isLoading }] = useCreateAppointmentMutation();
 
+  useEffect(() => {
+    if (!open) return;
+    if (initialScheduledLocal && initialScheduledLocal.trim()) {
+      setScheduledLocal(initialScheduledLocal.trim());
+    }
+  }, [open, initialScheduledLocal]);
+
   if (!open) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
     const pid = Number(patientId);

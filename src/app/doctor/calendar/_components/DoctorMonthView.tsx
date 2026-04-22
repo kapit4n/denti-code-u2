@@ -27,6 +27,8 @@ type Props = {
   monthAnchor: Date;
   appointments: Appointment[];
   patientById: Map<number, PatientProfile>;
+  /** Double-click empty part of a day cell (not on a visit link) to book a visit. */
+  onDayCellDoubleClick?: (day: Date) => void;
 };
 
 function appointmentsForDay(appointments: Appointment[], day: Date): Appointment[] {
@@ -42,6 +44,7 @@ export default function DoctorMonthView({
   monthAnchor,
   appointments,
   patientById,
+  onDayCellDoubleClick,
 }: Props) {
   const { t, intlLocale } = useTranslation();
   const monthStart = startOfMonth(monthAnchor);
@@ -73,9 +76,15 @@ export default function DoctorMonthView({
           return (
             <div
               key={day.toISOString()}
-              className={`min-h-[100px] sm:min-h-[120px] border-b border-r border-gray-100 p-1 sm:p-1.5 flex flex-col ${
+              className={`min-h-[100px] sm:min-h-[120px] border-b border-r border-gray-100 p-1 sm:p-1.5 flex flex-col select-none ${
                 !inMonth ? 'bg-gray-50/80' : 'bg-white'
               } ${isToday && inMonth ? 'ring-1 ring-inset ring-blue-300 bg-blue-50/30' : ''}`}
+              title={onDayCellDoubleClick ? t('doctor.calendar.dblClickNewVisit') : undefined}
+              onDoubleClick={(e) => {
+                if (!onDayCellDoubleClick) return;
+                if ((e.target as HTMLElement).closest('a')) return;
+                onDayCellDoubleClick(day);
+              }}
             >
               <div
                 className={`text-xs font-semibold tabular-nums mb-1 shrink-0 ${

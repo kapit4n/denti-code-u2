@@ -56,6 +56,12 @@ export function formatMonthYearLabel(d: Date, intlLocale = 'en-US'): string {
 }
 
 /** Monday-start weeks covering the full month (typically 5–6 rows × 7 days). */
+/** Value for `<input type="datetime-local" />` in the browser's local timezone. */
+export function toDatetimeLocalValue(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export function monthCalendarGrid(anchorInMonth: Date): Date[] {
   const monthStart = startOfMonth(anchorInMonth);
   const year = monthStart.getFullYear();
