@@ -31,6 +31,18 @@
     "showNavTitle": "Show navigation"
   },
   "logout": "Log out",
+  "loginBanner": {
+    "title": "Denti-Code",
+    "subtitle": "Complete dental practice management platform",
+    "description": "Manage your dental clinic efficiently with role-based tools for administrators, doctors, and patients.",
+    "features": {
+      "appointments": "Schedule and manage appointments with ease",
+      "treatments": "Record treatments, procedures, and clinical notes",
+      "patients": "Manage patient profiles, history, and payments",
+      "inventory": "Track material inventory across consultories",
+      "multiRole": "Dedicated portals for Admin, Doctor, and Patient roles"
+    }
+  },
   "login": {
     "title": "Sign In",
     "email": "Email address",

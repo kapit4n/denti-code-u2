@@ -31,6 +31,18 @@
     "showNavTitle": "Mostrar navegación"
   },
   "logout": "Cerrar sesión",
+  "loginBanner": {
+    "title": "Denti-Code",
+    "subtitle": "Plataforma completa de gestión de clínica dental",
+    "description": "Administra tu clínica dental eficientemente con herramientas basadas en roles para administradores, doctores y pacientes.",
+    "features": {
+      "appointments": "Programa y gestiona citas fácilmente",
+      "treatments": "Registra tratamientos, procedimientos y notas clínicas",
+      "patients": "Administra perfiles de pacientes, historial y pagos",
+      "inventory": "Controla el inventario de materiales por consultorio",
+      "multiRole": "Portales dedicados para roles de Administrador, Doctor y Paciente"
+    }
+  },
   "login": {
     "title": "Iniciar sesión",
     "email": "Correo electrónico",
