@@ -47,6 +47,7 @@ jest.mock('@/i18n/I18nContext', () => ({
 jest.mock('@/features/appointments/appointmentsApiSlice', () => ({
   appointmentsApiSlice: { reducerPath: 'appointmentsApi', reducer: () => ({}), middleware: () => (next: (action: unknown) => unknown) => (action: unknown) => next(action) },
   useGetAppointmentsQuery: () => ({ data: [], isLoading: false, isError: false }),
+  useGetMyAppointmentsQuery: () => ({ data: [], isLoading: false, isError: false }),
 }));
 
 jest.mock('@/features/doctors/doctorsApiSlice', () => ({
@@ -58,6 +59,7 @@ jest.mock('@/features/patients/patientsApiSlice', () => ({
   patientsApiSlice: { reducerPath: 'patientsApi', reducer: () => ({}), middleware: () => (next: (action: unknown) => unknown) => (action: unknown) => next(action) },
   useGetPatientsQuery: () => ({ data: [], isLoading: false, isError: false }),
   useCreatePatientMutation: () => [jest.fn(), { isLoading: false }],
+  useGetMyProfileQuery: () => ({ data: undefined, isLoading: false, isError: false }),
 }));
 
 jest.mock('@/features/procedures/proceduresApiSlice', () => ({
