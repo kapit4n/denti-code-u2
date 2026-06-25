@@ -7,7 +7,6 @@ import { useAppSelector } from '@/lib/redux/hooks';
 import { selectCurrentUser } from '@/features/auth/authSlice';
 import {
   useGetAppointmentQuery,
-  useAddPerformedActionMutation,
   useRemovePerformedActionMutation,
   useUpdateAppointmentMutation,
 } from '@/features/appointments/appointmentsApiSlice';
@@ -20,10 +19,7 @@ import { useGetPatientsQuery } from '@/features/patients/patientsApiSlice';
 import { APPOINTMENT_STATUSES } from '@/lib/appointments/appointmentStatus';
 import { appointmentStatusT } from '@/lib/appointments/appointmentStatusI18n';
 import { buildTreatmentFacilityGroupsFromApi } from '@/lib/doctor/buildTreatmentFacilityGroups';
-import {
-  ANESTHESIA_QUICK_KEYS,
-  TREATMENT_FACILITY_GROUPS,
-} from '@/lib/doctor/treatmentFacilitiesCatalog';
+import { TREATMENT_FACILITY_GROUPS } from '@/lib/doctor/treatmentFacilitiesCatalog';
 import { parseFacilityIdsFromApi } from '@/lib/doctor/parseFacilitiesUsed';
 import { useGetInventoryLinesQuery } from '@/features/inventory/inventoryApiSlice';
 import { useTranslation } from '@/i18n/I18nContext';
@@ -111,19 +107,9 @@ export default function DoctorAppointmentDetailPage() {
     error,
   } = useGetAppointmentQuery(appointmentId, { skip: !validId });
 
-  const [addAction, { isLoading: adding }] = useAddPerformedActionMutation();
   const [removeAction, { isLoading: isRemoving }] = useRemovePerformedActionMutation();
   const [updateAppointment, { isLoading: savingStatus }] = useUpdateAppointmentMutation();
 
-  const [procedureTypeId, setProcedureTypeId] = useState('');
-  const [quantity, setQuantity] = useState('1');
-  const [unitPrice, setUnitPrice] = useState('');
-  const [notes, setNotes] = useState('');
-  const [tooth, setTooth] = useState('');
-  const [surfaces, setSurfaces] = useState('');
-  const [anesthesia, setAnesthesia] = useState('');
-  const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
-  const [formError, setFormError] = useState('');
   const [statusDraft, setStatusDraft] = useState<AppointmentStatus>('Scheduled');
   const [statusError, setStatusError] = useState('');
 
@@ -154,68 +140,6 @@ export default function DoctorAppointmentDetailPage() {
     () => actions.reduce((sum, a) => sum + a.TotalPrice, 0),
     [actions],
   );
-
-  const onProcedureChange = (value: string) => {
-    setProcedureTypeId(value);
-    const id = Number.parseInt(value, 10);
-    const proc = procedureById.get(id);
-    if (proc?.StandardPrice != null) {
-      setUnitPrice(String(proc.StandardPrice));
-    } else if (value === '') {
-      setUnitPrice('');
-    }
-  };
-
-  const toggleFacility = (id: string) => {
-    setSelectedFacilities((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
-  };
-
-  const handleAddTreatment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError('');
-    if (!clinicDoctor || !appointment) return;
-
-    const procId = Number.parseInt(procedureTypeId, 10);
-    if (!Number.isFinite(procId)) {
-      setFormError(t('doctor.detail.errProcedure'));
-      return;
-    }
-    const qty = Math.max(1, Number.parseInt(quantity, 10) || 1);
-    const price = Number.parseFloat(unitPrice);
-    if (!Number.isFinite(price) || price < 0) {
-      setFormError(t('doctor.detail.errPrice'));
-      return;
-    }
-
-    try {
-      await addAction({
-        appointmentId: appointment.AppointmentID,
-        body: {
-          ProcedureTypeID: procId,
-          PerformingDoctorID: clinicDoctor.DoctorID,
-          Quantity: qty,
-          UnitPrice: price,
-          ...(notes.trim() ? { Description_Notes: notes.trim() } : {}),
-          ...(tooth.trim() ? { ToothInvolved: tooth.trim() } : {}),
-          ...(surfaces.trim() ? { SurfacesInvolved: surfaces.trim() } : {}),
-          ...(anesthesia.trim() ? { AnesthesiaUsed: anesthesia.trim() } : {}),
-          ...(selectedFacilities.length > 0 ? { FacilitiesUsed: selectedFacilities } : {}),
-        },
-      }).unwrap();
-      setProcedureTypeId('');
-      setQuantity('1');
-      setUnitPrice('');
-      setNotes('');
-      setTooth('');
-      setSurfaces('');
-      setAnesthesia('');
-      setSelectedFacilities([]);
-    } catch {
-      setFormError(t('doctor.detail.errSaveTreatment'));
-    }
-  };
 
   const handleSaveStatus = async () => {
     if (!appointment) return;
@@ -318,40 +242,60 @@ export default function DoctorAppointmentDetailPage() {
         </p>
       </div>
 
-      <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <h3 className="text-base font-semibold text-gray-900 mb-4">{t('doctor.detail.summary')}</h3>
-        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-          <div>
-            <dt className="text-gray-500">{t('doctor.detail.patient')}</dt>
-            <dd className="font-medium text-gray-900 mt-0.5">
-              {patient ? (
-                <span className="inline-flex items-center gap-2">
-                  <AvatarThumb
-                    src={patient.AvatarUrl}
-                    name={`${patient.FirstName} ${patient.LastName}`}
-                    size="sm"
-                  />
-                  <Link
-                    href={`/doctor/patients/${appointment.PatientID}`}
-                    className="text-blue-600 hover:text-blue-800 hover:underline"
-                  >
-                    {patient.FirstName} {patient.LastName}
-                  </Link>
-                  <span className="text-gray-400" aria-hidden>
-                    {' · '}
-                  </span>
-                  <Link
-                    href={`/doctor/patients/${appointment.PatientID}#patient-edit`}
-                    className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
-                  >
-                    {t('doctor.patients.edit')}
-                  </Link>
-                </span>
-              ) : (
-                t('doctor.detail.patientId', { id: appointment.PatientID })
-              )}
-            </dd>
+      <section className="bg-white rounded-xl border-l-4 border-l-blue-500 border border-gray-200 shadow-sm p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <h3 className="text-base font-semibold text-gray-900">{t('doctor.detail.patient')}</h3>
+        </div>
+        <div className="flex flex-wrap items-start gap-4 mb-4">
+          {patient && (
+            <AvatarThumb
+              src={patient.AvatarUrl}
+              name={`${patient.FirstName} ${patient.LastName}`}
+              size="md"
+            />
+          )}
+          <div className="min-w-0 flex-1">
+            {patient ? (
+              <>
+                <Link
+                  href={`/doctor/patients/${appointment.PatientID}`}
+                  className="text-lg font-semibold text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  {patient.FirstName} {patient.LastName}
+                </Link>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-gray-600">
+                  {patient.ContactPhone ? <span>{patient.ContactPhone}</span> : null}
+                  {patient.Email ? <span>{patient.Email}</span> : null}
+                  {patient.DateOfBirth ? (
+                    <span>
+                      {new Date(patient.DateOfBirth).toLocaleDateString(intlLocale, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </span>
+                  ) : null}
+                </div>
+              </>
+            ) : (
+              <p className="text-gray-900 font-medium">
+                {t('doctor.detail.patientId', { id: appointment.PatientID })}
+              </p>
+            )}
           </div>
+          {patient && (
+            <Link
+              href={`/doctor/patients/${appointment.PatientID}#patient-edit`}
+              className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline shrink-0"
+            >
+              {t('doctor.patients.edit')}
+            </Link>
+          )}
+        </div>
+        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm border-t border-gray-100 pt-4">
           <div>
             <dt className="text-gray-500">{t('doctor.detail.scheduled')}</dt>
             <dd className="font-medium text-gray-900">
@@ -361,7 +305,7 @@ export default function DoctorAppointmentDetailPage() {
               })}
             </dd>
           </div>
-          <div className="sm:col-span-2">
+          <div>
             <dt className="text-gray-500 mb-2">{t('doctor.detail.status')}</dt>
             <dd className="flex flex-wrap items-center gap-3">
               <select
@@ -403,14 +347,36 @@ export default function DoctorAppointmentDetailPage() {
         </dl>
       </section>
 
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center" aria-hidden>
+          <div className="w-full border-t border-gray-200" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="bg-gray-100 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+            {t('doctor.detail.treatmentsTitle')}
+          </span>
+        </div>
+      </div>
+
       <section className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-gray-100 flex flex-wrap justify-between items-center gap-4">
           <h3 className="text-base font-semibold text-gray-900">
             {t('doctor.detail.treatmentsTitle')}
           </h3>
-          <p className="text-lg font-bold text-gray-900">
-            {t('doctor.detail.total', { amount: money.format(totalCost) })}
-          </p>
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/doctor/appointments/${appointmentId}/add-treatment`}
+              className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm py-2 px-4 rounded-lg transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {t('doctor.detail.addTreatmentTitle')}
+            </Link>
+            <p className="text-lg font-bold text-gray-900">
+              {t('doctor.detail.total', { amount: money.format(totalCost) })}
+            </p>
+          </div>
         </div>
         {actions.length === 0 ? (
           <p className="p-6 text-gray-500 text-sm">{t('doctor.detail.noTreatments')}</p>
@@ -520,194 +486,7 @@ export default function DoctorAppointmentDetailPage() {
         )}
       </section>
 
-      <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <h3 className="text-base font-semibold text-gray-900 mb-4">
-          {t('doctor.detail.addTreatmentTitle')}
-        </h3>
-        <form onSubmit={handleAddTreatment} className="space-y-4 max-w-3xl">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="proc">
-              {t('doctor.detail.procedure')}
-            </label>
-            <select
-              id="proc"
-              className="w-full border rounded-lg px-3 py-2 text-gray-900"
-              value={procedureTypeId}
-              onChange={(e) => onProcedureChange(e.target.value)}
-              required
-            >
-              <option value="">{t('doctor.detail.selectProcedure')}</option>
-              {procedures
-                .filter((p) => p.IsActive !== false)
-                .map((p) => (
-                  <option key={p.ProcedureTypeID} value={p.ProcedureTypeID}>
-                    {p.ProcedureName}
-                    {p.StandardPrice != null ? ` — ${money.format(p.StandardPrice)}` : ''}
-                  </option>
-                ))}
-            </select>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="qty">
-                {t('doctor.detail.quantity')}
-              </label>
-              <input
-                id="qty"
-                type="number"
-                min={1}
-                className="w-full border rounded-lg px-3 py-2 text-gray-900"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="price">
-                {t('doctor.detail.unitPrice')}
-              </label>
-              <input
-                id="price"
-                type="number"
-                min={0}
-                step="0.01"
-                className="w-full border rounded-lg px-3 py-2 text-gray-900"
-                value={unitPrice}
-                onChange={(e) => setUnitPrice(e.target.value)}
-                placeholder="0.00"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="tooth">
-              {t('doctor.detail.toothOptional')}
-            </label>
-            <input
-              id="tooth"
-              type="text"
-              className="w-full border rounded-lg px-3 py-2 text-gray-900"
-              value={tooth}
-              onChange={(e) => setTooth(e.target.value)}
-              placeholder={t('doctor.detail.toothPlaceholder')}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="surfaces">
-              {t('doctor.detail.surfacesOptional')}
-            </label>
-            <input
-              id="surfaces"
-              type="text"
-              className="w-full border rounded-lg px-3 py-2 text-gray-900"
-              value={surfaces}
-              onChange={(e) => setSurfaces(e.target.value)}
-              placeholder={t('doctor.detail.surfacesPlaceholder')}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="anesthesia">
-              {t('doctor.detail.anesthesiaLabel')}
-            </label>
-            <textarea
-              id="anesthesia"
-              rows={2}
-              className="w-full border rounded-lg px-3 py-2 text-gray-900"
-              value={anesthesia}
-              onChange={(e) => setAnesthesia(e.target.value)}
-              placeholder={t('doctor.detail.anesthesiaPlaceholder')}
-            />
-            <p className="text-xs text-gray-500 mt-1.5">{t('doctor.detail.anesthesiaQuick')}</p>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {ANESTHESIA_QUICK_KEYS.map((key) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() =>
-                    setAnesthesia(t(`doctor.facilitiesCatalog.anesthesiaQuick.${key}`))
-                  }
-                  className="text-xs px-2.5 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-800 hover:bg-gray-100"
-                >
-                  {t(`doctor.facilitiesCatalog.anesthesiaQuick.${key}`)}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm font-medium text-gray-900">{t('doctor.detail.facilitiesTitle')}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{t('doctor.detail.facilitiesHint')}</p>
-            </div>
-            {facilityGroups.map((group) => (
-              <fieldset
-                key={group.groupKey}
-                className="border border-gray-200 rounded-lg p-3 bg-gray-50/50"
-              >
-                <legend className="text-xs font-semibold text-gray-700 px-1">
-                  {t(group.groupKey)}
-                </legend>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-                  {group.ids.map((fid) => (
-                    <label
-                      key={fid}
-                      className={`flex items-start gap-2 text-sm cursor-pointer ${
-                        (inventoryQtyByCode.get(fid) ?? 0) <= 0 ? 'text-gray-400' : 'text-gray-800'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        className="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        checked={selectedFacilities.includes(fid)}
-                        onChange={() => toggleFacility(fid)}
-                        disabled={(inventoryQtyByCode.get(fid) ?? 0) <= 0}
-                      />
-                      <span className="flex flex-wrap items-center gap-2">
-                        <span>{facilityItemLabel(t, fid, facilityDisplayByCode.get(fid))}</span>
-                        <span
-                          className={`text-[11px] px-1.5 py-0.5 rounded-md border font-mono tabular-nums ${
-                            (inventoryQtyByCode.get(fid) ?? 0) <= 0
-                              ? 'bg-red-50 text-red-700 border-red-200'
-                              : (inventoryQtyByCode.get(fid) ?? 0) <= lowStockThreshold
-                                ? 'bg-amber-50 text-amber-800 border-amber-200'
-                                : 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                          }`}
-                          title={t('doctor.detail.inventoryQtyTitle')}
-                        >
-                          {t('doctor.detail.inventoryQty', { qty: inventoryQtyByCode.get(fid) ?? 0 })}
-                        </span>
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
-            ))}
-            <p className="text-xs text-gray-500">
-              {t('doctor.detail.inventoryHint')}{' '}
-              <Link href="/admin/inventory" className="text-blue-600 hover:underline">
-                {t('doctor.detail.inventoryLink')}
-              </Link>
-            </p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="tnotes">
-              {t('doctor.detail.clinicalNotes')}
-            </label>
-            <textarea
-              id="tnotes"
-              rows={3}
-              className="w-full border rounded-lg px-3 py-2 text-gray-900"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-            />
-          </div>
-          {formError && <p className="text-sm text-red-600">{formError}</p>}
-          <button
-            type="submit"
-            disabled={adding || procedures.length === 0}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg disabled:opacity-50"
-          >
-            {adding ? t('doctor.detail.saving') : t('doctor.detail.addTreatment')}
-          </button>
-        </form>
-      </section>
+
     </div>
   );
 }

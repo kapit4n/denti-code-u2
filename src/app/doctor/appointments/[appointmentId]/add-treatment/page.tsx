@@ -1,0 +1,442 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useAppSelector } from '@/lib/redux/hooks';
+import { selectCurrentUser } from '@/features/auth/authSlice';
+import {
+  useGetAppointmentQuery,
+  useAddPerformedActionMutation,
+} from '@/features/appointments/appointmentsApiSlice';
+import { useGetDoctorsQuery } from '@/features/doctors/doctorsApiSlice';
+import {
+  useGetProcedureTypesQuery,
+  useGetTreatmentFacilitiesQuery,
+} from '@/features/procedures/proceduresApiSlice';
+import { buildTreatmentFacilityGroupsFromApi } from '@/lib/doctor/buildTreatmentFacilityGroups';
+import {
+  ANESTHESIA_QUICK_KEYS,
+  TREATMENT_FACILITY_GROUPS,
+} from '@/lib/doctor/treatmentFacilitiesCatalog';
+import { useGetInventoryLinesQuery } from '@/features/inventory/inventoryApiSlice';
+import { useTranslation } from '@/i18n/I18nContext';
+
+function facilityItemLabel(
+  t: (key: string, vars?: Record<string, string | number>) => string,
+  id: string,
+  apiDisplayName?: string,
+): string {
+  const key = `doctor.facilitiesCatalog.items.${id}`;
+  const out = t(key);
+  if (out !== key) return out;
+  return apiDisplayName ?? id;
+}
+
+export default function AddTreatmentPage() {
+  const { t, intlLocale } = useTranslation();
+  const router = useRouter();
+  const params = useParams();
+  const rawId = params?.appointmentId;
+  const appointmentId =
+    typeof rawId === 'string' ? Number.parseInt(rawId, 10) : Number.NaN;
+  const validId = Number.isFinite(appointmentId) && appointmentId > 0;
+
+  const money = useMemo(
+    () =>
+      new Intl.NumberFormat(intlLocale, {
+        style: 'currency',
+        currency: 'USD',
+      }),
+    [intlLocale],
+  );
+
+  const user = useAppSelector(selectCurrentUser);
+  const { data: doctors = [] } = useGetDoctorsQuery();
+  const { data: procedures = [] } = useGetProcedureTypesQuery();
+  const { data: apiTreatmentFacilities } = useGetTreatmentFacilitiesQuery();
+  const inventoryConsultoryId = Number.parseInt(
+    process.env.NEXT_PUBLIC_INVENTORY_CONSULTORY_ID ?? '1',
+    10,
+  );
+  const { data: inventoryLines = [] } = useGetInventoryLinesQuery(
+    Number.isFinite(inventoryConsultoryId) && inventoryConsultoryId > 0
+      ? { consultoryId: inventoryConsultoryId }
+      : undefined,
+  );
+  const { data: appointment, isLoading, isError, error } = useGetAppointmentQuery(appointmentId, {
+    skip: !validId,
+  });
+
+  const clinicDoctor = useMemo(() => {
+    if (!user?.email) return undefined;
+    return doctors.find((d) => d.Email.toLowerCase() === user.email.toLowerCase());
+  }, [doctors, user?.email]);
+
+  const facilityDisplayByCode = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const f of apiTreatmentFacilities ?? []) {
+      m.set(f.FacilityCode, f.DisplayName);
+    }
+    return m;
+  }, [apiTreatmentFacilities]);
+
+  const facilityGroups = useMemo(() => {
+    const fromApi = buildTreatmentFacilityGroupsFromApi(apiTreatmentFacilities);
+    if (fromApi && fromApi.length > 0) return fromApi;
+    return TREATMENT_FACILITY_GROUPS;
+  }, [apiTreatmentFacilities]);
+
+  const inventoryQtyByCode = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const line of inventoryLines) {
+      const code = line.facility?.FacilityCode;
+      if (!code) continue;
+      m.set(code, line.Quantity ?? 0);
+    }
+    return m;
+  }, [inventoryLines]);
+
+  const lowStockThreshold = 5;
+
+  const procedureById = useMemo(() => {
+    const m = new Map<number, (typeof procedures)[0]>();
+    for (const p of procedures) {
+      m.set(p.ProcedureTypeID, p);
+    }
+    return m;
+  }, [procedures]);
+
+  const [addAction, { isLoading: adding }] = useAddPerformedActionMutation();
+
+  const [procedureTypeId, setProcedureTypeId] = useState('');
+  const [quantity, setQuantity] = useState('1');
+  const [unitPrice, setUnitPrice] = useState('');
+  const [notes, setNotes] = useState('');
+  const [tooth, setTooth] = useState('');
+  const [surfaces, setSurfaces] = useState('');
+  const [anesthesia, setAnesthesia] = useState('');
+  const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
+  const [formError, setFormError] = useState('');
+
+  const onProcedureChange = (value: string) => {
+    setProcedureTypeId(value);
+    const id = Number.parseInt(value, 10);
+    const proc = procedureById.get(id);
+    if (proc?.StandardPrice != null) {
+      setUnitPrice(String(proc.StandardPrice));
+    } else if (value === '') {
+      setUnitPrice('');
+    }
+  };
+
+  const toggleFacility = (id: string) => {
+    setSelectedFacilities((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  };
+
+  const handleAddTreatment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError('');
+    if (!clinicDoctor || !appointment) return;
+
+    const procId = Number.parseInt(procedureTypeId, 10);
+    if (!Number.isFinite(procId)) {
+      setFormError(t('doctor.detail.errProcedure'));
+      return;
+    }
+    const qty = Math.max(1, Number.parseInt(quantity, 10) || 1);
+    const price = Number.parseFloat(unitPrice);
+    if (!Number.isFinite(price) || price < 0) {
+      setFormError(t('doctor.detail.errPrice'));
+      return;
+    }
+
+    try {
+      await addAction({
+        appointmentId: appointment.AppointmentID,
+        body: {
+          ProcedureTypeID: procId,
+          PerformingDoctorID: clinicDoctor.DoctorID,
+          Quantity: qty,
+          UnitPrice: price,
+          ...(notes.trim() ? { Description_Notes: notes.trim() } : {}),
+          ...(tooth.trim() ? { ToothInvolved: tooth.trim() } : {}),
+          ...(surfaces.trim() ? { SurfacesInvolved: surfaces.trim() } : {}),
+          ...(anesthesia.trim() ? { AnesthesiaUsed: anesthesia.trim() } : {}),
+          ...(selectedFacilities.length > 0 ? { FacilitiesUsed: selectedFacilities } : {}),
+        },
+      }).unwrap();
+      router.push(`/doctor/appointments/${appointmentId}`);
+    } catch {
+      setFormError(t('doctor.detail.errSaveTreatment'));
+    }
+  };
+
+  if (!validId) {
+    return (
+      <div className="space-y-4">
+        <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
+          {t('doctor.nav.backVisits')}
+        </Link>
+        <p className="text-red-600">{t('doctor.detail.invalidAppt')}</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div>
+        <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
+          {t('doctor.nav.backVisits')}
+        </Link>
+        <p className="mt-4 text-gray-500">{t('doctor.detail.loadingAppt')}</p>
+      </div>
+    );
+  }
+
+  if (isError || !appointment) {
+    return (
+      <div>
+        <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
+          {t('doctor.nav.backVisits')}
+        </Link>
+        <p className="mt-4 text-red-600">
+          {t('doctor.detail.loadApptError')}
+          {error && 'data' in error && (error.data as { message?: string })?.message
+            ? ` ${(error.data as { message?: string }).message}`
+            : ''}
+        </p>
+      </div>
+    );
+  }
+
+  if (!clinicDoctor) {
+    return (
+      <div>
+        <Link href="/doctor/appointments" className="text-blue-600 hover:underline text-sm">
+          {t('doctor.nav.backVisits')}
+        </Link>
+        <p className="mt-4 text-amber-800">{t('doctor.detail.noClinicDoctor')}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <Link
+          href={`/doctor/appointments/${appointmentId}`}
+          className="text-blue-600 hover:underline text-sm"
+        >
+          &larr; {t('doctor.nav.backVisits')}
+        </Link>
+        <h2 className="text-2xl font-bold text-gray-900 mt-2">
+          {t('doctor.detail.addTreatmentTitle')}
+        </h2>
+        <p className="text-gray-500 text-sm mt-1">
+          {t('doctor.detail.ref', { id: appointment.AppointmentID })}
+        </p>
+      </div>
+
+      <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <form onSubmit={handleAddTreatment} className="space-y-4 max-w-3xl">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="proc">
+              {t('doctor.detail.procedure')}
+            </label>
+            <select
+              id="proc"
+              className="w-full border rounded-lg px-3 py-2 text-gray-900"
+              value={procedureTypeId}
+              onChange={(e) => onProcedureChange(e.target.value)}
+              required
+            >
+              <option value="">{t('doctor.detail.selectProcedure')}</option>
+              {procedures
+                .filter((p) => p.IsActive !== false)
+                .map((p) => (
+                  <option key={p.ProcedureTypeID} value={p.ProcedureTypeID}>
+                    {p.ProcedureName}
+                    {p.StandardPrice != null ? ` — ${money.format(p.StandardPrice)}` : ''}
+                  </option>
+                ))}
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="qty">
+                {t('doctor.detail.quantity')}
+              </label>
+              <input
+                id="qty"
+                type="number"
+                min={1}
+                className="w-full border rounded-lg px-3 py-2 text-gray-900"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="price">
+                {t('doctor.detail.unitPrice')}
+              </label>
+              <input
+                id="price"
+                type="number"
+                min={0}
+                step="0.01"
+                className="w-full border rounded-lg px-3 py-2 text-gray-900"
+                value={unitPrice}
+                onChange={(e) => setUnitPrice(e.target.value)}
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="tooth">
+              {t('doctor.detail.toothOptional')}
+            </label>
+            <input
+              id="tooth"
+              type="text"
+              className="w-full border rounded-lg px-3 py-2 text-gray-900"
+              value={tooth}
+              onChange={(e) => setTooth(e.target.value)}
+              placeholder={t('doctor.detail.toothPlaceholder')}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="surfaces">
+              {t('doctor.detail.surfacesOptional')}
+            </label>
+            <input
+              id="surfaces"
+              type="text"
+              className="w-full border rounded-lg px-3 py-2 text-gray-900"
+              value={surfaces}
+              onChange={(e) => setSurfaces(e.target.value)}
+              placeholder={t('doctor.detail.surfacesPlaceholder')}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="anesthesia">
+              {t('doctor.detail.anesthesiaLabel')}
+            </label>
+            <textarea
+              id="anesthesia"
+              rows={2}
+              className="w-full border rounded-lg px-3 py-2 text-gray-900"
+              value={anesthesia}
+              onChange={(e) => setAnesthesia(e.target.value)}
+              placeholder={t('doctor.detail.anesthesiaPlaceholder')}
+            />
+            <p className="text-xs text-gray-500 mt-1.5">{t('doctor.detail.anesthesiaQuick')}</p>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {ANESTHESIA_QUICK_KEYS.map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() =>
+                    setAnesthesia(t(`doctor.facilitiesCatalog.anesthesiaQuick.${key}`))
+                  }
+                  className="text-xs px-2.5 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-800 hover:bg-gray-100"
+                >
+                  {t(`doctor.facilitiesCatalog.anesthesiaQuick.${key}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm font-medium text-gray-900">{t('doctor.detail.facilitiesTitle')}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{t('doctor.detail.facilitiesHint')}</p>
+            </div>
+            {facilityGroups.map((group) => (
+              <fieldset
+                key={group.groupKey}
+                className="border border-gray-200 rounded-lg p-3 bg-gray-50/50"
+              >
+                <legend className="text-xs font-semibold text-gray-700 px-1">
+                  {t(group.groupKey)}
+                </legend>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                  {group.ids.map((fid) => (
+                    <label
+                      key={fid}
+                      className={`flex items-start gap-2 text-sm cursor-pointer ${
+                        (inventoryQtyByCode.get(fid) ?? 0) <= 0
+                          ? 'text-gray-400'
+                          : 'text-gray-800'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        checked={selectedFacilities.includes(fid)}
+                        onChange={() => toggleFacility(fid)}
+                        disabled={(inventoryQtyByCode.get(fid) ?? 0) <= 0}
+                      />
+                      <span className="flex flex-wrap items-center gap-2">
+                        <span>{facilityItemLabel(t, fid, facilityDisplayByCode.get(fid))}</span>
+                        <span
+                          className={`text-[11px] px-1.5 py-0.5 rounded-md border font-mono tabular-nums ${
+                            (inventoryQtyByCode.get(fid) ?? 0) <= 0
+                              ? 'bg-red-50 text-red-700 border-red-200'
+                              : (inventoryQtyByCode.get(fid) ?? 0) <= lowStockThreshold
+                                ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          }`}
+                          title={t('doctor.detail.inventoryQtyTitle')}
+                        >
+                          {t('doctor.detail.inventoryQty', {
+                            qty: inventoryQtyByCode.get(fid) ?? 0,
+                          })}
+                        </span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ))}
+            <p className="text-xs text-gray-500">
+              {t('doctor.detail.inventoryHint')}{' '}
+              <Link href="/admin/inventory" className="text-blue-600 hover:underline">
+                {t('doctor.detail.inventoryLink')}
+              </Link>
+            </p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="tnotes">
+              {t('doctor.detail.clinicalNotes')}
+            </label>
+            <textarea
+              id="tnotes"
+              rows={3}
+              className="w-full border rounded-lg px-3 py-2 text-gray-900"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
+          </div>
+          {formError && <p className="text-sm text-red-600">{formError}</p>}
+          <div className="flex items-center gap-3">
+            <button
+              type="submit"
+              disabled={adding || procedures.length === 0}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg disabled:opacity-50"
+            >
+              {adding ? t('doctor.detail.saving') : t('doctor.detail.addTreatment')}
+            </button>
+            <Link
+              href={`/doctor/appointments/${appointmentId}`}
+              className="text-sm text-gray-600 hover:text-gray-900 hover:underline"
+            >
+              {t('common.cancel')}
+            </Link>
+          </div>
+        </form>
+      </section>
+    </div>
+  );
+}
