@@ -1,4 +1,10 @@
 {
+  "notifications": {
+    "title": "Notificaciones",
+    "markAllRead": "Marcar todo como leído",
+    "empty": "Sin notificaciones",
+    "bellAria": "Notificaciones ({count} sin leer)"
+  },
   "common": {
     "loading": "Cargando…",
     "save": "Guardar",
@@ -55,7 +61,13 @@
   "home": {
     "title": "Bienvenido a Denti-Code",
     "subtitle": "Tu asistente moderno para la clínica dental.",
-    "login": "Iniciar sesión"
+    "login": "Iniciar sesión",
+    "heroDesc": "Una plataforma open-source completa para gestionar clínicas dentales. Programa citas, registra tratamientos, administra pacientes y controla el inventario — todo en un solo lugar.",
+    "forTitle": "¿Para quién es?",
+    "forAdmin": "Gestiona toda la clínica: usuarios, servicios, inventario y configuración del sistema.",
+    "forDoctor": "Tu agenda, pacientes que atiendes, documentación de visitas y métricas clínicas.",
+    "forPatient": "Citas, tu dentista y costos de visita en un solo lugar.",
+    "footer": "Denti-Code — Gestión de clínica dental open source"
   },
   "portal": {
     "administration": "Administración",

@@ -9,6 +9,7 @@ import { localeApiSlice } from '@/features/locale/localeApiSlice';
 import { systemStatusApiSlice } from '@/features/systemStatus/systemStatusApiSlice';
 import { inventoryApiSlice } from '@/features/inventory/inventoryApiSlice';
 import { paymentsApiSlice } from '@/features/payments/paymentsApiSlice';
+import { notificationsApiSlice } from '@/features/notifications/notificationsApiSlice';
 import {
   setAuthTokenCookie,
   clearAuthTokenCookie,
@@ -41,6 +42,7 @@ export const makeStore = () => {
       [systemStatusApiSlice.reducerPath]: systemStatusApiSlice.reducer,
       [inventoryApiSlice.reducerPath]: inventoryApiSlice.reducer,
       [paymentsApiSlice.reducerPath]: paymentsApiSlice.reducer,
+      [notificationsApiSlice.reducerPath]: notificationsApiSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware()
@@ -53,7 +55,8 @@ export const makeStore = () => {
         .concat(localeApiSlice.middleware)
         .concat(systemStatusApiSlice.middleware)
         .concat(inventoryApiSlice.middleware)
-        .concat(paymentsApiSlice.middleware),
+        .concat(paymentsApiSlice.middleware)
+        .concat(notificationsApiSlice.middleware),
   });
 };
 

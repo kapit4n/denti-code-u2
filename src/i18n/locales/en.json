@@ -1,4 +1,10 @@
 {
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "empty": "No notifications",
+    "bellAria": "Notifications ({count} unread)"
+  },
   "common": {
     "loading": "Loading…",
     "save": "Save",
@@ -55,7 +61,13 @@
   "home": {
     "title": "Welcome to Denti-Code",
     "subtitle": "Your modern dental practice assistant.",
-    "login": "Login"
+    "login": "Sign In",
+    "heroDesc": "A complete open-source platform for managing dental clinics. Schedule appointments, record treatments, manage patients, and track inventory — all in one place.",
+    "forTitle": "Who is it for?",
+    "forAdmin": "Manage the entire practice: users, services, inventory, and system configuration.",
+    "forDoctor": "Your schedule, patients you treat, visit documentation, and clinical metrics.",
+    "forPatient": "Appointments, your dentist, and visit costs in one place.",
+    "footer": "Denti-Code — Open source dental practice management"
   },
   "portal": {
     "administration": "Administration",

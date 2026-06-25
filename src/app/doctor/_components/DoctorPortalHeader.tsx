@@ -4,6 +4,7 @@ import { useAppSelector } from '@/lib/redux/hooks';
 import { selectCurrentUser } from '@/features/auth/authSlice';
 import ProfileAvatarNav from '@/components/ProfileAvatarNav';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import NotificationBell from '@/components/NotificationBell';
 import { useTranslation } from '@/i18n/I18nContext';
 
 export default function DoctorPortalHeader() {
@@ -24,6 +25,7 @@ export default function DoctorPortalHeader() {
         </div>
         <div className="flex items-start gap-3 shrink-0">
           <LanguageSwitcher />
+          <NotificationBell />
           <ProfileAvatarNav />
         </div>
       </div>
